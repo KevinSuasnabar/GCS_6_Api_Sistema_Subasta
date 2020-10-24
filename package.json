@@ -1,0 +1,29 @@
+{
+  "name": "GCS_6_Api_Sistema_Subasta",
+  "version": "1.0.0",
+  "description": "Sistema de subastas desarrollado por el grupo 6 de los alumnos de la Facultad de Ingenería de Sistemas e Informática.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RSulca/GCS_6_Api_Sistema_Subasta.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RSulca/GCS_6_Api_Sistema_Subasta/issues"
+  },
+  "homepage": "https://github.com/RSulca/GCS_6_Api_Sistema_Subasta#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.10.10",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}

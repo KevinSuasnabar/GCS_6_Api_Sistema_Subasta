@@ -1,0 +1,4 @@
+* Para instalar las dependencias: express, mongoose y morgan
+* Solo en desarrollo se utiliza nodemon
+* Para iniciar en el servidor de producción se usa npm start 
+* Para desarrollo y que los cambios se refresquen automáticamente se usa npm run dev

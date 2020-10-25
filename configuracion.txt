@@ -2,3 +2,25 @@
 * Solo en desarrollo se utiliza nodemon
 * Para iniciar en el servidor de producción se usa npm start 
 * Para desarrollo y que los cambios se refresquen automáticamente se usa npm run dev
+
+
+//para subir al develop desde tu rama
+
+//para tu rama
+* git status
+* git add .
+* git commit -m "mensaje"
+* git push origin tuRama
+
+//para subir al develop
+* git checkout develop
+* git merge tuRama
+* git push origin develop
+
+
+//para traer los cambios del develop
+Empiezas en tu rama, luego haces esto
+* git checkout origin develop
+* git pull origin develop
+* git checkout tuRama
+* git merge develop

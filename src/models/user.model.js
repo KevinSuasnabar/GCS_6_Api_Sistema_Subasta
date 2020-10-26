@@ -34,7 +34,7 @@ const UserSchema = Schema({
         type: String,
         required: false
     },
-    birdthdate: {
+    bornDate: {
         type: Date,
         required: false
     },

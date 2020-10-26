@@ -1,6 +1,19 @@
+require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const { dbConnection } = require('./database/config');
+
 const app = express();
 
-app.listen(3000, () => {
-    console.log('Server on port 3000  ');
-});
+app.use(cors());
+app.use(express.json());
+dbConnection();
+
+app.use('/api/register', require('./routes/register.route'));
+app.use('/api/auth', require('./routes/auth.route'));
+app.use('/api/user', require('./routes/user.route'));
+
+app.listen(process.env.PORT, () => {
+    console.log(`Server run in port ${process.env.PORT}`);
+})

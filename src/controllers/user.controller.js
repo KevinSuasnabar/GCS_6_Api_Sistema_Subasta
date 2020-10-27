@@ -1,7 +1,18 @@
 const { response, request } = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user.model');
+const Ubigeo = require('../models/ubigeo.model');
 const { generateJWT } = require('../helpers/jwt.helper');
+
+const getUser = async(req, res) => {
+    const id = req.params.id;
+    const user = await User.findById(id).populate('ubigeo');
+
+    return res.status(200).json({
+        ok: true,
+        user
+    })
+}
 
 const getUsers = async(req, res) => {
     const since = Number(req.query.since) || 0;
@@ -21,7 +32,6 @@ const getUsers = async(req, res) => {
         _id: req._id,
     })
 }
-
 const createUser = async(req = request, res = response) => {
     const user = new User(req.body);
     try {
@@ -60,7 +70,7 @@ const createUser = async(req = request, res = response) => {
 
 const updateUser = async(req = request, res) => {
     const id = req.params.id;
-    const { password, google, ...data } = req.body;
+    const { google, email, dni, ...data } = req.body;
     try {
         const find = await User.findById(id);
         if (!find) {
@@ -69,9 +79,13 @@ const updateUser = async(req = request, res) => {
                 message: 'This user does not exist.'
             })
         } else {
-            const same = await User.findOne({ email: data.email });
-            console.log(data);
-            const new_user = await User.findByIdAndUpdate(id, data, { new: true });
+            if (data.password) {
+                const salt = bcrypt.genSaltSync();
+                data.password = bcrypt.hashSync(data.password, salt);
+            }
+            const ubigeoData = new Ubigeo(data);
+            await ubigeoData.save();
+            const new_user = await User.findByIdAndUpdate(id, {...data, ubigeo: ubigeoData._id }, { new: true });
             let data_user = {...new_user._doc };
             delete data_user.password;
             return res.status(200).json({
@@ -83,6 +97,7 @@ const updateUser = async(req = request, res) => {
         console.log(error);
         res.status(500).json({
             ok: false,
+            error,
             message: 'Error, please check logs.'
         })
     }
@@ -114,4 +129,4 @@ const deleteUser = async(req = request, res) => {
     }
 }
 
-module.exports = { updateUser };
+module.exports = { getUser, updateUser };

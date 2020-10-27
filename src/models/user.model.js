@@ -23,7 +23,8 @@ const UserSchema = Schema({
     },
     img: {
         type: String,
-        required: false
+        required: false,
+        default: "http://res.cloudinary.com/deaehe41t/image/upload/v1603771241/kbxska3uzy8bkcll8es2.jpg"
     },
     role: {
         type: String,

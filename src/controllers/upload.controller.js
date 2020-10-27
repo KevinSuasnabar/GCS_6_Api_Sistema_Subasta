@@ -57,9 +57,9 @@ const uploadPhoto = async(req = request, res = response) => {
                 await User.findByIdAndUpdate(id, { img: result.url })
             });
 
-            // if (fs.existsSync(pathName)) {
-            //     fs.unlinkSync(pathName)
-            // }
+            if (fs.existsSync(pathName)) {
+                fs.unlinkSync(pathName)
+            }
 
             return res.status(200).json({
                 path: pathName,

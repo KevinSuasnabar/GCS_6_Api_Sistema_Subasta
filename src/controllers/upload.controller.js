@@ -47,6 +47,7 @@ const uploadPhoto = async(req = request, res = response) => {
             await cloudinary.uploader.upload(pathName, async(error, result) => {
                 if (error) {
                     return res.status(500).json({
+                        path: pathName,
                         message: "cloud",
                         ok: false,
                         error
@@ -56,11 +57,12 @@ const uploadPhoto = async(req = request, res = response) => {
                 await User.findByIdAndUpdate(id, { img: result.url })
             });
 
-            if (fs.existsSync(pathName)) {
-                fs.unlinkSync(pathName)
-            }
+            // if (fs.existsSync(pathName)) {
+            //     fs.unlinkSync(pathName)
+            // }
 
             return res.status(200).json({
+                path: pathName,
                 ok: true,
                 message: 'File updated.',
                 data: url

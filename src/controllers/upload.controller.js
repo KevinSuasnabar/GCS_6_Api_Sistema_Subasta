@@ -35,7 +35,7 @@ const uploadPhoto = async(req = request, res = response) => {
 
         const pathName = path.join(__dirname, `../../upload/${photo.name}`);
 
-        photo.mv(pathName, (err) => {
+        photo.mv(`./upload/${photo.name}`, (err) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,

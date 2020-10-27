@@ -37,6 +37,7 @@ const uploadPhoto = async(req = request, res = response) => {
         photo.mv(pathName, async(err) => {
             if (err) {
                 return res.status(500).json({
+                    path: pathName,
                     meesage: "use mv",
                     ok: false,
                     err

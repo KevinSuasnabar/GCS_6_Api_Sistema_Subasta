@@ -32,7 +32,7 @@ const uploadPhoto = async(req = request, res = response) => {
             })
         }
 
-        const pathName = path.join(__dirname, `../upload/${photo.name}`);
+        const pathName = `./src/upload/${photo.name}`;
         console.log(pathName);
 
         photo.mv(pathName, (err) => {

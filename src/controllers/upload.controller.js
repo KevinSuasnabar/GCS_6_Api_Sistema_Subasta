@@ -2,6 +2,8 @@ const { response, request } = require('express');
 const User = require('../models/user.model');
 const fs = require('fs');
 const path = require('path');
+const { v4: uuidv4 } = require('uuid');
+
 const cloudinary = require('cloudinary').v2;
 
 const uploadPhoto = async(req = request, res = response) => {
@@ -32,7 +34,8 @@ const uploadPhoto = async(req = request, res = response) => {
             })
         }
 
-        const pathName = `./src/upload/${photo.name}`;
+        const unique_name = `${uuidv4()}.${extension}`;
+        const pathName = `./src/upload/${unique_name}`;
         console.log(pathName);
 
         photo.mv(pathName, (err) => {
@@ -55,10 +58,11 @@ const uploadPhoto = async(req = request, res = response) => {
             }
             url = result.url;
             await User.findByIdAndUpdate(id, { img: result.url })
-            if (fs.existsSync(pathName)) {
-                fs.unlinkSync(pathName)
-            }
         });
+
+        if (fs.existsSync(pathName)) {
+            fs.unlinkSync(pathName)
+        }
 
         return res.status(200).json({
             ok: true,

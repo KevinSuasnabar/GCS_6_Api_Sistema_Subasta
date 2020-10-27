@@ -1,6 +1,7 @@
 const { response, request } = require('express');
 const User = require('../models/user.model');
 const fs = require('fs');
+const path = require('path');
 const cloudinary = require('cloudinary').v2;
 
 const uploadPhoto = async(req = request, res = response) => {
@@ -32,9 +33,9 @@ const uploadPhoto = async(req = request, res = response) => {
             })
         }
 
-        const path = `./upload/${photo.name}`;
+        const pathName = path.join(__dirname, `../../upload/${photo.name}`);
 
-        photo.mv(path, (err) => {
+        photo.mv(pathName, (err) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,
@@ -43,7 +44,7 @@ const uploadPhoto = async(req = request, res = response) => {
             }
         })
 
-        await cloudinary.uploader.upload(path, async(error, result) => {
+        await cloudinary.uploader.upload(pathName, async(error, result) => {
             if (error) {
                 return res.status(500).json({
                     ok: false,
@@ -54,8 +55,8 @@ const uploadPhoto = async(req = request, res = response) => {
             await User.findByIdAndUpdate(id, { img: result.url })
         });
 
-        if (fs.existsSync(path)) {
-            fs.unlinkSync(path)
+        if (fs.existsSync(pathName)) {
+            fs.unlinkSync(pathName)
         }
 
         return res.status(200).json({
@@ -65,7 +66,7 @@ const uploadPhoto = async(req = request, res = response) => {
         })
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             ok: false,
             message: 'Error, please check logs.'
         })

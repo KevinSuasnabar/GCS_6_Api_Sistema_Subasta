@@ -1,9 +1,6 @@
 const { response, request } = require('express');
 const User = require('../models/user.model');
 const fs = require('fs');
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
-
 const cloudinary = require('cloudinary').v2;
 
 const uploadPhoto = async(req = request, res = response) => {
@@ -34,8 +31,7 @@ const uploadPhoto = async(req = request, res = response) => {
             })
         }
 
-        const unique_name = `${uuidv4()}.${extension}`;
-        const pathName = `./src/upload/${unique_name}`;
+        const pathName = `./src/upload/${photo.name}`;
         console.log(pathName);
 
         photo.mv(pathName, (err) => {

@@ -34,7 +34,7 @@ const uploadPhoto = async(req = request, res = response) => {
         const pathName = `./src/upload/${photo.name}`;
         console.log(pathName);
 
-        photo.mv(pathName, (err) => {
+        photo.mv(pathName, async(err) => {
             if (err) {
                 return res.status(500).json({
                     meesage: "use mv",
@@ -42,29 +42,31 @@ const uploadPhoto = async(req = request, res = response) => {
                     err
                 })
             }
-        })
 
-        await cloudinary.uploader.upload(pathName, async(error, result) => {
-            if (error) {
-                return res.status(500).json({
-                    message: "cloud",
-                    ok: false,
-                    error
-                })
+            await cloudinary.uploader.upload(pathName, async(error, result) => {
+                if (error) {
+                    return res.status(500).json({
+                        message: "cloud",
+                        ok: false,
+                        error
+                    })
+                }
+                url = result.url;
+                await User.findByIdAndUpdate(id, { img: result.url })
+            });
+
+            if (fs.existsSync(pathName)) {
+                fs.unlinkSync(pathName)
             }
-            url = result.url;
-            await User.findByIdAndUpdate(id, { img: result.url })
-        });
 
-        // if (fs.existsSync(pathName)) {
-        //     fs.unlinkSync(pathName)
-        // }
+            return res.status(200).json({
+                ok: true,
+                message: 'File updated.',
+                data: url
+            })
 
-        return res.status(200).json({
-            ok: true,
-            message: 'File updated.',
-            data: url
         })
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({

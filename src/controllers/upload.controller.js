@@ -32,13 +32,9 @@ const uploadPhoto = async(req = request, res = response) => {
         }
 
         const pathName = `./src/upload/${photo.name}`;
-        console.log(pathName);
-
         photo.mv(pathName, async(err) => {
             if (err) {
                 return res.status(500).json({
-                    path: pathName,
-                    meesage: "use mv",
                     ok: false,
                     err
                 })
@@ -47,8 +43,6 @@ const uploadPhoto = async(req = request, res = response) => {
             await cloudinary.uploader.upload(pathName, async(error, result) => {
                 if (error) {
                     return res.status(500).json({
-                        path: pathName,
-                        message: "cloud",
                         ok: false,
                         error
                     })
@@ -62,7 +56,6 @@ const uploadPhoto = async(req = request, res = response) => {
             }
 
             return res.status(200).json({
-                path: pathName,
                 ok: true,
                 message: 'File updated.',
                 data: url

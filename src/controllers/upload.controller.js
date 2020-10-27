@@ -22,7 +22,6 @@ const uploadPhoto = async(req = request, res = response) => {
             });
         }
         const photo = req.files.photo;
-
         const clean_name = photo.name.split('.');
         const extension = clean_name[clean_name.length - 1];
         const extensions_valids = ['jpg', 'png', 'jpeg', 'gif'];
@@ -33,9 +32,10 @@ const uploadPhoto = async(req = request, res = response) => {
             })
         }
 
-        const pathName = path.join(__dirname, `../../upload/${photo.name}`);
+        const pathName = path.join(__dirname, `../upload/${photo.name}`);
+        console.log(pathName);
 
-        photo.mv(`./upload/${photo.name}`, (err) => {
+        photo.mv(pathName, (err) => {
             if (err) {
                 return res.status(500).json({
                     meesage: "use mv",
@@ -57,9 +57,9 @@ const uploadPhoto = async(req = request, res = response) => {
             await User.findByIdAndUpdate(id, { img: result.url })
         });
 
-        if (fs.existsSync(pathName)) {
-            fs.unlinkSync(pathName)
-        }
+        // if (fs.existsSync(pathName)) {
+        //     fs.unlinkSync(pathName)
+        // }
 
         return res.status(200).json({
             ok: true,

@@ -3,7 +3,7 @@
 */
 
 const { Router } = require('express');
-const { updateUser } = require('../controllers/user.controller');
+const { updateUser, getUser } = require('../controllers/user.controller');
 const { validationJWT } = require('../middlewares/validation-jwt.middleware');
 const router = Router();
 
@@ -15,6 +15,7 @@ const router = Router();
 //     validationFields
 // ], createUser);
 router.put('/:id', [validationJWT], updateUser);
+router.get('/:id', [validationJWT], getUser);
 // router.delete('/:id', [validationJWT, validationAdminRole], deleteUser);
 
 module.exports = router;

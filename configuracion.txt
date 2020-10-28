@@ -14,13 +14,13 @@
 
 //para subir al develop
 * git checkout develop
-* git merge tuRama
+* git merge tuRama 
 * git push origin develop
 
 
 //para traer los cambios del develop
 Empiezas en tu rama, luego haces esto
-* git checkout origin develop
+* git checkout develop
 * git pull origin develop
 * git checkout tuRama
 * git merge develop

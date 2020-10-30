@@ -1,6 +1,7 @@
 const { response, request } = require('express');
 const User = require('../models/user.model');
 const fs = require('fs');
+const path = require('path');
 const cloudinary = require('cloudinary').v2;
 
 const uploadPhoto = async(req = request, res = response) => {
@@ -31,38 +32,39 @@ const uploadPhoto = async(req = request, res = response) => {
             })
         }
 
-        const pathName = `./src/upload/${photo.name}`;
-        photo.mv(pathName, async(err) => {
+        const pathName = path.join(__dirname, `../upload/${photo.name}`);
+        console.log(pathName);
+
+        photo.mv(pathName, (err) => {
             if (err) {
                 return res.status(500).json({
+                    meesage: "use mv",
                     ok: false,
                     err
                 })
             }
+        })
 
-            await cloudinary.uploader.upload(pathName, async(error, result) => {
-                if (error) {
-                    return res.status(500).json({
-                        ok: false,
-                        error
-                    })
-                }
-                url = result.url;
-                await User.findByIdAndUpdate(id, { img: result.url })
-            });
-
+        await cloudinary.uploader.upload(pathName, async(error, result) => {
+            if (error) {
+                return res.status(500).json({
+                    message: "cloud",
+                    ok: false,
+                    error
+                })
+            }
+            url = result.url;
+            await User.findByIdAndUpdate(id, { img: result.url })
             if (fs.existsSync(pathName)) {
                 fs.unlinkSync(pathName)
             }
+        });
 
-            return res.status(200).json({
-                ok: true,
-                message: 'File updated.',
-                data: url
-            })
-
+        return res.status(200).json({
+            ok: true,
+            message: 'File updated.',
+            data: url
         })
-
     } catch (error) {
         console.log(error);
         return res.status(500).json({

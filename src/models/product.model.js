@@ -13,9 +13,14 @@ const ProductSchema = Schema({
         type: String,
         required: true
     },
+    state: {
+        required: false,
+        type: String,
+        default: "ENVIADO"
+    },
     imgs: {
         type: [String],
-        required: true
+        required: false
     },
     user: {
         required: true,
@@ -24,4 +29,4 @@ const ProductSchema = Schema({
     }
 });
 
-module.exports = model('User', ProductSchema);
+module.exports = model('Product', ProductSchema);

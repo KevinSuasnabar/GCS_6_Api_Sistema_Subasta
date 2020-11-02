@@ -1,7 +1,6 @@
 const { response, request } = require('express');
 const User = require('../models/user.model');
 const fs = require('fs');
-const path = require('path');
 const cloudinary = require('cloudinary').v2;
 
 const uploadPhoto = async(req = request, res = response) => {
@@ -32,13 +31,11 @@ const uploadPhoto = async(req = request, res = response) => {
             })
         }
 
-        const pathName = path.join(__dirname, `../upload/${photo.name}`);
-        console.log(pathName);
+        const pathName = `./src/upload/${photo.name}`;
 
         photo.mv(pathName, (err) => {
             if (err) {
                 return res.status(500).json({
-                    meesage: "use mv",
                     ok: false,
                     err
                 })
@@ -48,7 +45,6 @@ const uploadPhoto = async(req = request, res = response) => {
         await cloudinary.uploader.upload(pathName, async(error, result) => {
             if (error) {
                 return res.status(500).json({
-                    message: "cloud",
                     ok: false,
                     error
                 })
@@ -66,7 +62,6 @@ const uploadPhoto = async(req = request, res = response) => {
             data: url
         })
     } catch (error) {
-        console.log(error);
         return res.status(500).json({
             ok: false,
             message: 'Error, please check logs.'
@@ -74,6 +69,71 @@ const uploadPhoto = async(req = request, res = response) => {
     }
 }
 
+const uploadPhotoProduct = async(req = request, res = response) => {
+    try {
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).json({
+                ok: false,
+                message: 'No files were uploaded.'
+            });
+        }
+        let photos = [];
+        let urls = [];
+        photos.push(req.files.img1);
+        photos.push(req.files.img2);
+        photos.push(req.files.img3);
+        photos.forEach(photo => {
+            let clean_name = photo.name.split('.');
+            let extension = clean_name[clean_name.length - 1];
+            let extensions_valids = ['jpg', 'png', 'jpeg', 'gif'];
+            if (!extensions_valids.includes(extension)) {
+                return res.status(400).json({
+                    ok: false,
+                    message: `Extension no valid in ${photo.name}`
+                })
+            }
+        })
+        photos.forEach(async(photo) => {
+            let pathName = `./src/upload/product/${photo.name}`;
+            photo.mv(pathName, (err) => {
+                if (err) {
+                    return res.status(500).json({
+                        ok: false,
+                        err
+                    })
+                }
+            })
+            await cloudinary.uploader.upload(pathName, (error, result) => {
+                if (error) {
+                    return res.status(500).json({
+                        ok: false,
+                        error
+                    })
+                }
+                urls.push(result.url);
+                if (fs.existsSync(pathName)) {
+                    fs.unlinkSync(pathName)
+                }
+            });
+        })
+        let inter = setInterval(() => {
+            if (urls.length === 3) {
+                clearInterval(inter)
+                return res.status(200).json({
+                    ok: true,
+                    message: 'Files updated.',
+                    urls
+                })
+            }
+        }, 500);
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            message: 'Error, please check logs.'
+        })
+    }
+}
 module.exports = {
-    uploadPhoto
+    uploadPhoto,
+    uploadPhotoProduct
 }

@@ -42,6 +42,6 @@ exports.actualizar = function(req, res) {
     supervisor.findByIdAndUpdate(req.params.id, {estado: estado}, function(err, supervisor) {
       if (err)
         res.send(err);
-      res.json({message: 'Producto eliminado' });
+      res.json({message: 'Supervisor eliminado' });
     });
   };

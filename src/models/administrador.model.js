@@ -21,29 +21,17 @@ const UserSchema = Schema({
         type: String,
         required: false
     },
-    especialidad: {
-        type: String,
-        required: false
-    },
-    categoria: {
-        type: String,
-        required: true
-    },
     estado: {
         type: String,
         default: 'A',
         required: true
     },
-    password: {
-        type: String,
-        required: true
-    },
     rol: {
         type: String,
         required: true,
-        default: "SUPERVISOR_ROLE"
+        default: "ADMIN_ROLE"
     },
 
 });
 
-module.exports = model('supervisor', supervisorSchema);
+module.exports = model('administrador', administradorSchema);

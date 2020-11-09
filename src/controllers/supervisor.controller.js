@@ -1,47 +1,97 @@
-'use strict';
+const { response, request } = require('express');
+const User = require('../models/user.model');
 
-const mongoose = require('mongoose'),
+const actualizar = async(req = request, res = response) => {
+  const id = req.params.id;
+  try{
+    const supervisor = await User.findById(id);
+    if (!supervisor) {
+        return res.status(404).json({
+            ok: false,
+            message: 'Supervisor no existe.'
+        })
+    } else {
+        await User.findByIdAndUpdate(id, req.body, { new: true }, function(err, supervisor_actualizado){
+        if(!err) {
+          return res.status(200).json({
+            ok: true,
+            user: supervisor_actualizado
+          })
+        }
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+        ok: false,
+        message: 'Error al actualizar.'
+    })
+  }
+}
 
-supervisor = mongoose.model('supervisor.model');
+const obtener = async(req = request, res = response) => {
+  const id = req.params.id;
+  try{
+    await User.findById(req.params.id, function(err, supervisor) {
+      if(!err) {
+        return res.status(200).json({
+          ok: true,
+          user: supervisor
+        })
+      }
+      });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+        ok: false,
+        message: 'Error al obtener datos.'
+    })
+  }
+}
 
-exports.registrar = function(req, res) {
-    var nuevoSupervisor = new supervisor(req.body);
-    nuevoSupervisor.save(function(err, supervisor) {
-      if (err)
-        res.send(err);
-      res.json(supervisor);
-    });
-  };
+const listar = async(req = request, res = response) => {
+  try{
+    await User.find({}, function(err, supervisor) {
+      if(!err) {
+        return res.status(200).json({
+          ok: true,
+          user: supervisor
+        })
+      }
+      });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+        ok: false,
+        message: 'Error al obtener datos.'
+    })
+  }
+}
 
-exports.actualizar = function(req, res) {
-    supervisor.findOneAndUpdate({_id: req.params.id}, req.body, {new: true}, function(err, supervisor) {
-      if (err)
-        res.send(err);
-      res.json(supervisor);
-    });
-  };
-
-  exports.obtener = function(req, res) {
-    supervisor.findById(req.params.id, function(err, supervisor) {
-      if (err)
-        res.send(err);
-      res.json(supervisor);
-    });
-  };
-
-  exports.listar = function(req, res) {
-    supervisor.find({}, function(err, supervisor) {
-      if (err)
-        res.send(err);
-      res.json(supervisor);
-    });
-  };
-
-  exports.eliminar = function(req, res) {
-    const estado = 'I';
-    supervisor.findByIdAndUpdate(req.params.id, {estado: estado}, function(err, supervisor) {
-      if (err)
-        res.send(err);
-      res.json({message: 'Supervisor eliminado' });
-    });
-  };
+const eliminar = async(req = request, res = response) => {
+  const id = req.params.id;
+  try{
+    const supervisor = await User.findById(id);
+    if (!supervisor) {
+        return res.status(404).json({
+            ok: false,
+            message: 'Supervisor no existe.'
+        })
+    } else {
+      await User.findByIdAndUpdate(id, {estado: false}, { new: true }, function(err, supervisor_actualizado){
+        if(!err) {
+          return res.status(200).json({
+            ok: true,
+            user: supervisor_actualizado
+          })
+        }
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+        ok: false,
+        message: 'Error al obtener datos.'
+    })
+  }
+}

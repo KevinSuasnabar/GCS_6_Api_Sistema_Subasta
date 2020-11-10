@@ -2,7 +2,7 @@ const { response, request } = require('express');
 const User = require('../models/user.model');
 
 const actualizar = async(req = request, res = response) => {
-  const id = req.params.id;
+  const id = req.body.id;
   try{
     const supervisor = await User.findById(id);
     if (!supervisor) {
@@ -30,9 +30,9 @@ const actualizar = async(req = request, res = response) => {
 }
 
 const obtener = async(req = request, res = response) => {
-  const id = req.params.id;
+  const id = req.body.id;
   try{
-    await User.findById(req.params.id, function(err, supervisor) {
+    await User.findById(id, function(err, supervisor) {
       if(!err) {
         return res.status(200).json({
           ok: true,
@@ -51,7 +51,7 @@ const obtener = async(req = request, res = response) => {
 
 const listar = async(req = request, res = response) => {
   try{
-    await User.find({}, function(err, supervisor) {
+    await User.find({role : "SUPERVISOR_ROLE"}, function(err, supervisor) {
       if(!err) {
         return res.status(200).json({
           ok: true,
@@ -69,7 +69,7 @@ const listar = async(req = request, res = response) => {
 }
 
 const eliminar = async(req = request, res = response) => {
-  const id = req.params.id;
+  const id = req.body.id;
   try{
     const supervisor = await User.findById(id);
     if (!supervisor) {
@@ -95,3 +95,5 @@ const eliminar = async(req = request, res = response) => {
     })
   }
 }
+
+module.exports = { actualizar, obtener, listar, eliminar };

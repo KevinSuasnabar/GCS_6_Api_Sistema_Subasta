@@ -1,16 +1,14 @@
-'use strict';
+/*
+    Path: /api/supervisor
+*/
 
-module.exports = function(app) {
-    var supervisor = require('../controllers/supervisor.controller');
-  
-    app.route('/api/supervisores')
-      .get(supervisor.listar)
-      .post(supervisor.registrar);
-  
-    app.route('/api/supervisores/:id')
-      .get(supervisor.obtener)
-      .put(supervisor.actualizar)
-      .put(supervisor.eliminar);  
-  };
+const { Router } = require('express');
+const { actualizar, obtener, listar, eliminar } = require('../controllers/supervisor.controller');
+const router = Router();
 
-  module.exports = router;
+router.put('/actualizar', actualizar);
+router.get('/obtener', obtener);
+router.get('/listar', listar);
+router.put('/eliminar', eliminar);
+
+module.exports = router; 

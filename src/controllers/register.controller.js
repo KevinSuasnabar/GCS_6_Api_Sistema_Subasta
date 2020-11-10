@@ -45,7 +45,6 @@ const registerUser = async(req = request, res = response) => {
 
 const registerSupervisor = async(req = request, res = response) => {
     const user = new User(req.body);
-    console.log(user.email);
     try {
         const current_email = await User.findOne({ email: user.email });
         const current_dni = await User.findOne({ dni: user.dni });

@@ -44,7 +44,7 @@ const obtener = async(req = request, res = response) => {
     console.log(error);
     res.status(500).json({
         ok: false,
-        message: 'Error al obtener datos.'
+        message: 'Error al obtener datos.' 
     })
   }
 }

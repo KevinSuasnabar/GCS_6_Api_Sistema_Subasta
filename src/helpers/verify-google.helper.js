@@ -10,6 +10,7 @@ const verify = async(token) => {
     const { name, email, img } = payload;
     const userid = payload['sub'];
     return { name, email, picture };
+    //return { name, email };
 }
 
 module.exports = {

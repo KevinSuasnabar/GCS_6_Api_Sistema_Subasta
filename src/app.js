@@ -17,6 +17,7 @@ app.use('/api/upload', require('./routes/upload.route'));
 app.use('/api/category', require('./routes/category.route'));
 app.use('/api/product', require('./routes/product.route'));
 app.use('/api/supervisor', require('./routes/supervisor.route'));
+app.use('/api/cliente', require('./routes/cliente.route'));
 
 app.listen(process.env.PORT, () => {
     console.log(`Server run in port ${process.env.PORT}`);

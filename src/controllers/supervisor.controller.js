@@ -40,7 +40,7 @@ const obtener = async(req = request, res = response) => {
         })
       }
       });
-  } catch (error) {
+  } catch (error) { 
     console.log(error);
     res.status(500).json({
         ok: false,
@@ -69,16 +69,18 @@ const listar = async(req = request, res = response) => {
 }
 
 const eliminar = async(req = request, res = response) => {
-  const id = req.body.id;
+ const id = req.body.id;
+ const state =  req.body.state;
   try{
     const supervisor = await User.findById(id);
+    if (supervisor)
     if (!supervisor) {
         return res.status(404).json({
             ok: false,
             message: 'Supervisor no existe.'
         })
     } else {
-      await User.findByIdAndUpdate(id, {estado: false}, { new: true }, function(err, supervisor_actualizado){
+      await User.findByIdAndUpdate(id, {state: state}, { new: true }, function(err, supervisor_actualizado){
         if(!err) {
           return res.status(200).json({
             ok: true,

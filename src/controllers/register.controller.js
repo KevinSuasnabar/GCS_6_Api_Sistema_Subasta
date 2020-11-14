@@ -51,14 +51,14 @@ const registerSupervisor = async(req = request, res = response) => {
         if (current_email) {
             return res.status(400).json({
                 ok: false,
-                message: 'This email is already exists. '
+                message: 'El correo ya existe. '
             })
         }
 
         if (current_dni) {
             return res.status(400).json({
                 ok: false,
-                message: 'This dni is already exists. '
+                message: 'Este dni ya existe. '
             })
         }
 
@@ -68,19 +68,14 @@ const registerSupervisor = async(req = request, res = response) => {
         user.password = bcrypt.hashSync(user.password, salt);
 
         await user.save();
-        const token = await generateJWT(user._id);
-        let user_send = {...user._doc }
-        delete user_send.password;
         res.json({
-            ok: true,
-            user: user_send,
-            token
+            ok: true
         })
     } catch (error) {
         console.log(error);
         res.status(500).json({
             ok: false,
-            message: 'Error, please check logs.'
+            message: 'Error, revisar logs.'
         })
     }
 }

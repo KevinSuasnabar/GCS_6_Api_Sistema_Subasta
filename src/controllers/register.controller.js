@@ -29,14 +29,14 @@ const registerUser = async(req = request, res = response) => {
         const token = await generateJWT(user._id);
         let user_send = {...user._doc }
         delete user_send.password;
-        res.json({
+        return res.status(200).json({
             ok: true,
             user: user_send,
             token
         })
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             ok: false,
             message: 'Error, please check logs.'
         })
@@ -68,7 +68,7 @@ const registerSupervisor = async(req = request, res = response) => {
         user.password = bcrypt.hashSync(user.password, salt);
 
         await user.save();
-        res.json({
+        return res.json({
             ok: true
         })
     } catch (error) {

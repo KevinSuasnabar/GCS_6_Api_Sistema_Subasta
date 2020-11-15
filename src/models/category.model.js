@@ -1,4 +1,7 @@
-const { Schema, model } = require('mongoose');
+const {
+    Schema,
+    model
+} = require('mongoose');
 
 const CategorySchema = Schema({
     name: {
@@ -8,6 +11,14 @@ const CategorySchema = Schema({
     img: {
         type: String,
         required: true
+    },
+    color: {
+        type: String,
+        required: false
+    },
+    simple_name: {
+        type: String,
+        required: false //deberia ser true
     }
 });
 

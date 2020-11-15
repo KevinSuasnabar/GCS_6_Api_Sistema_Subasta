@@ -22,12 +22,18 @@ const login = async(req = request, res = response) => {
                 message: 'Incorrect credentials.'
             });
         }
+        if (!data.state) {
+            return res.status(400).json({
+                ok: false,
+                message: 'User disabled'
+            });
+        }
         const token = await generateJWT(data._id)
         return res.status(200).json({
             ok: true,
             message: 'Welcome',
             token,
-            menu: getMenu(data.role)
+            role: data.role
         });
     } catch (error) {
         console.log(error);
@@ -59,6 +65,12 @@ const loginGoogle = async(req, res) => {
                 google: true
             });
         } else {
+            if (!user.state) {
+                return res.status(400).json({
+                    ok: false,
+                    message: 'User disabled'
+                });
+            }
             new_user = user;
             new_user.google = true;
         }

@@ -42,7 +42,7 @@ const login = async (req = request, res = response) => {
                 message: 'User disabled'
             });
         }
-        const token = await generateJWT(data._id)
+        const token = await generateJWT(data)
         return res.status(200).json({
             ok: true,
             message: 'Welcome',
@@ -86,6 +86,7 @@ const loginGoogle = async (req, res) => {
                 img: picture,
                 google: true
             });
+
         } else {
             if (!user.state) {
                 return res.status(400).json({
@@ -97,7 +98,7 @@ const loginGoogle = async (req, res) => {
             new_user.google = true;
         }
         const data = await new_user.save();
-        const token = await generateJWT(data._id)
+        const token = await generateJWT(data)
         return res.status(200).json({
             ok: true,
             token,

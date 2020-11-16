@@ -79,6 +79,9 @@ const updateUser = async(req = request, res) => {
                 message: 'This user does not exist.'
             })
         } else {
+            if (data.firstEntry) {
+                data.firstEntry = false;
+            }
             if (data.password) {
                 const salt = bcrypt.genSaltSync();
                 data.password = bcrypt.hashSync(data.password, salt);

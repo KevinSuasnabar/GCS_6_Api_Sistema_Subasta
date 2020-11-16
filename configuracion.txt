@@ -14,7 +14,7 @@
 
 //para subir al develop
 * git checkout develop
-* git merge tuRama
+* git merge tuRama 
 * git push origin develop
 
 

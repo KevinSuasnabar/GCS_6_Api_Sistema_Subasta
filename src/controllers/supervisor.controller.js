@@ -1,8 +1,13 @@
 const { response, request } = require('express');
+const bcrypt = require('bcryptjs');
 const User = require('../models/user.model');
 
 const actualizar = async(req = request, res = response) => {
   const id = req.body.id;
+  const nombres = req.body.name;
+  const apellidos = req.body.lastname;
+  const dni = req.body.dni;
+  const password = req.body.password;
   try{
     const supervisor = await User.findById(id);
     if (!supervisor) {
@@ -11,7 +16,13 @@ const actualizar = async(req = request, res = response) => {
             message: 'Supervisor no existe.'
         })
     } else {
-        await User.findByIdAndUpdate(id, req.body, { new: true }, function(err, supervisor_actualizado){
+        //Encrypt password
+        const salt = bcrypt.genSaltSync();
+        const password_enc = bcrypt.hashSync(password, salt);
+        console.log(password);
+        console.log(password_enc);
+        await User.findByIdAndUpdate(id, {name : nombres, lastname : apellidos, dni : dni, password :
+           password_enc}, { new: true }, function(err, supervisor_actualizado){
         if(!err) {
           return res.status(200).json({
             ok: true,
@@ -30,7 +41,8 @@ const actualizar = async(req = request, res = response) => {
 }
 
 const obtener = async(req = request, res = response) => {
-  const id = req.body.id;
+  const id = req.params.id;
+  console.log(id);
   try{
     await User.findById(id, function(err, supervisor) {
       if(!err) {

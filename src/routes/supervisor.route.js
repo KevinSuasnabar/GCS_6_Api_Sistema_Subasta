@@ -7,7 +7,7 @@ const { actualizar, obtener, listar, eliminar } = require('../controllers/superv
 const router = Router();
 
 router.put('/actualizar', actualizar);
-router.get('/obtener', obtener);
+router.get('/obtener/:id', obtener);
 router.get('/listar', listar);
 router.put('/eliminar', eliminar);
 

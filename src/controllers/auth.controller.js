@@ -22,12 +22,18 @@ const login = async(req = request, res = response) => {
                 message: 'Incorrect credentials.'
             });
         }
-        const token = await generateJWT(data._id)
+        if (!data.state) {
+            return res.status(400).json({
+                ok: false,
+                message: 'User disabled'
+            });
+        }
+        const token = await generateJWT(data)
         return res.status(200).json({
             ok: true,
             message: 'Welcome',
             token,
-            menu: getMenu(data.role)
+            role: data.role
         });
     } catch (error) {
         console.log(error);
@@ -58,12 +64,19 @@ const loginGoogle = async(req, res) => {
                 img: picture,
                 google: true
             });
+
         } else {
+            if (!user.state) {
+                return res.status(400).json({
+                    ok: false,
+                    message: 'User disabled'
+                });
+            }
             new_user = user;
             new_user.google = true;
         }
         const data = await new_user.save();
-        const token = await generateJWT(data._id)
+        const token = await generateJWT(data)
         return res.status(200).json({
             ok: true,
             token,

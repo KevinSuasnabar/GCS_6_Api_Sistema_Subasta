@@ -54,14 +54,14 @@ const createUser = async(req = request, res = response) => {
         }
         let user_send = {...user._doc }
         delete user_send.password;
-        res.json({
+        return res.json({
             ok: true,
             user: user_send,
             token
         })
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             ok: false,
             message: 'Error, please check logs.'
         })
@@ -79,6 +79,9 @@ const updateUser = async(req = request, res) => {
                 message: 'This user does not exist.'
             })
         } else {
+            if (data.firstEntry) {
+                data.firstEntry = false;
+            }
             if (data.password) {
                 const salt = bcrypt.genSaltSync();
                 data.password = bcrypt.hashSync(data.password, salt);
@@ -95,7 +98,7 @@ const updateUser = async(req = request, res) => {
         }
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             ok: false,
             error,
             message: 'Error, please check logs.'

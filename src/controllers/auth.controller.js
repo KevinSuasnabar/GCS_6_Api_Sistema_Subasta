@@ -1,14 +1,28 @@
-const { response, request } = require('express');
+const {
+    response,
+    request
+} = require('express');
 const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
-const { generateJWT } = require('../helpers/jwt.helper');
-const { verify } = require('../helpers/verify-google.helper');
-const { getMenu } = require('../helpers/menu-frontend.helper');
+const {
+    generateJWT
+} = require('../helpers/jwt.helper');
+const {
+    verify
+} = require('../helpers/verify-google.helper');
+const {
+    getMenu
+} = require('../helpers/menu-frontend.helper');
 
-const login = async(req = request, res = response) => {
-    const { email, password } = req.body;
+const login = async (req = request, res = response) => {
+    const {
+        email,
+        password
+    } = req.body;
     try {
-        const data = await User.findOne({ email });
+        const data = await User.findOne({
+            email
+        });
         if (!data) {
             return res.status(401).json({
                 ok: false,
@@ -32,6 +46,7 @@ const login = async(req = request, res = response) => {
         return res.status(200).json({
             ok: true,
             message: 'Welcome',
+            user: data,
             token,
             role: data.role
         });
@@ -44,7 +59,7 @@ const login = async(req = request, res = response) => {
     }
 }
 
-const loginGoogle = async(req, res) => {
+const loginGoogle = async (req, res) => {
     try {
         if (!req.body.token) {
             return res.status(401).json({
@@ -52,8 +67,15 @@ const loginGoogle = async(req, res) => {
                 message: "No token"
             })
         }
-        const { name, lastname, email, picture } = await verify(req.body.token);
-        const user = await User.findOne({ email });
+        const {
+            name,
+            lastname,
+            email,
+            picture
+        } = await verify(req.body.token);
+        const user = await User.findOne({
+            email
+        });
         let new_user;
         if (!user) {
             new_user = new User({
@@ -80,6 +102,7 @@ const loginGoogle = async(req, res) => {
         return res.status(200).json({
             ok: true,
             token,
+            user:data,
             menu: getMenu(data.role)
         })
 

@@ -19,8 +19,6 @@ const actualizar = async(req = request, res = response) => {
             //Encrypt password
             const salt = bcrypt.genSaltSync();
             const password_enc = bcrypt.hashSync(password, salt);
-            console.log(password);
-            console.log(password_enc);
             await User.findByIdAndUpdate(id, {name : nombres, lastname : apellidos, dni : dni, password :
                password_enc}, { new: true }, function(err, supervisor_actualizado){
             if(!err) {
@@ -110,4 +108,24 @@ const eliminar = async(req = request, res = response) => {
     }
 }
 
-module.exports = { actualizar, obtener, listar, eliminar };
+const cantidadSupervisores = async(req = request, res = response) => {
+    try {        
+        var query = User.find({ role: "SUPERVISOR_ROLE" });
+        query.count(function(err, count) {
+            if (!err) {
+                return res.status(200).json({
+                    ok: true,
+                    cantidad: count
+                })
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            message: 'Error al obtener datos.'
+        })
+    }
+}
+
+module.exports = { actualizar, obtener, listar, eliminar, cantidadSupervisores };

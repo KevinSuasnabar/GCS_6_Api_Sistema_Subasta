@@ -70,7 +70,7 @@ const createUser = async(req = request, res = response) => {
 
 const updateUser = async(req = request, res) => {
     const id = req.params.id;
-    const { google, email, dni, ...data } = req.body;
+    const { google, email, ...data } = req.body;
     try {
         const find = await User.findById(id);
         if (!find) {

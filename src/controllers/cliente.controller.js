@@ -50,4 +50,24 @@ const eliminar = async(req = request, res = response) => {
     }
 }
 
-module.exports = { listar, eliminar };
+const cantidadClientes = async(req = request, res = response) => {
+    try {        
+        var query = User.find({ role: "CLIENT_ROLE" });
+        query.count(function(err, count) {
+            if (!err) {
+                return res.status(200).json({
+                    ok: true,
+                    cantidad: count
+                })
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            message: 'Error al obtener datos.'
+        })
+    }
+}
+
+module.exports = { listar, eliminar, cantidadClientes };

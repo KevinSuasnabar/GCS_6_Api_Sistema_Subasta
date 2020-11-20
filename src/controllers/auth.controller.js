@@ -14,7 +14,7 @@ const {
     getMenu
 } = require('../helpers/menu-frontend.helper');
 
-const login = async (req = request, res = response) => {
+const login = async(req = request, res = response) => {
     const {
         email,
         password
@@ -59,7 +59,7 @@ const login = async (req = request, res = response) => {
     }
 }
 
-const loginGoogle = async (req, res) => {
+const loginGoogle = async(req, res) => {
     try {
         if (!req.body.token) {
             return res.status(401).json({
@@ -102,12 +102,7 @@ const loginGoogle = async (req, res) => {
         return res.status(200).json({
             ok: true,
             token,
-<<<<<<< HEAD
             role: data.role
-=======
-            user:data,
-            menu: getMenu(data.role)
->>>>>>> 6ad73d071c8d200dc0b417ed168f30724973b666
         })
 
     } catch (error) {

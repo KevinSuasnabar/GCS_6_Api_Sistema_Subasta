@@ -34,4 +34,47 @@ const getProductsByUser = async(req = request, res) => {
     }
 }
 
-module.exports = { addProduct, getProductsByUser };
+const listarProductoPorCategoria = async(req = request, res = response) => {
+    const category = req.params.category;
+    console.log(category);
+    try {
+        await Product.find({ category: category }, function(err, categoria) {
+            if (!err) {
+                return res.status(200).json({
+                    ok: true,
+                    categoria
+                })
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            message: 'Error al obtener datos.'
+        })
+    }
+}
+
+const cantidadProductos = async(req = request, res = response) => {
+    try {        
+        var query = Product.find();
+        query.count(function(err, count) {
+            if (!err) {
+                return res.status(200).json({
+                    ok: true,
+                    cantidad: count
+                })
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            message: 'Error al obtener datos.'
+        })
+    }
+}
+
+
+
+module.exports = { addProduct, getProductsByUser, listarProductoPorCategoria, cantidadProductos };

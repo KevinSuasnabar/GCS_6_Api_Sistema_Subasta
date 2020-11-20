@@ -80,7 +80,7 @@ const loginGoogle = async(req, res) => {
         return res.status(200).json({
             ok: true,
             token,
-            menu: getMenu(data.role)
+            role: data.role
         })
 
     } catch (error) {

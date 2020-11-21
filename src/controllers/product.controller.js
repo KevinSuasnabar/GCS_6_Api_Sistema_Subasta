@@ -56,7 +56,7 @@ const listarProductoPorCategoria = async(req = request, res = response) => {
 }
 
 const cantidadProductos = async(req = request, res = response) => {
-    try {        
+    try {
         var query = Product.find();
         query.count(function(err, count) {
             if (!err) {

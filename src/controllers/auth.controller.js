@@ -102,6 +102,7 @@ const loginGoogle = async(req, res) => {
         return res.status(200).json({
             ok: true,
             token,
+            user:new_user,
             role: data.role
         })
 

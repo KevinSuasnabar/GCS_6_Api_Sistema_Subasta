@@ -1,10 +1,15 @@
-const { response, request } = require('express');
+const {
+    response,
+    request
+} = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user.model');
 const Ubigeo = require('../models/ubigeo.model');
-const { generateJWT } = require('../helpers/jwt.helper');
+const {
+    generateJWT
+} = require('../helpers/jwt.helper');
 
-const getUser = async(req, res) => {
+const getUser = async (req, res) => {
     const id = req.params.id;
     const user = await User.findById(id).populate('ubigeo');
 
@@ -14,7 +19,7 @@ const getUser = async(req, res) => {
     })
 }
 
-const getUsers = async(req, res) => {
+const getUsers = async (req, res) => {
     const since = Number(req.query.since) || 0;
     const to = Number(req.query.to) || 10;
 
@@ -32,10 +37,12 @@ const getUsers = async(req, res) => {
         _id: req._id,
     })
 }
-const createUser = async(req = request, res = response) => {
+const createUser = async (req = request, res = response) => {
     const user = new User(req.body);
     try {
-        const current_email = await User.findOne({ email: user.email });
+        const current_email = await User.findOne({
+            email: user.email
+        });
         if (current_email) {
             return res.status(400).json({
                 ok: false,
@@ -52,7 +59,9 @@ const createUser = async(req = request, res = response) => {
         const userShow = {
             ...user
         }
-        let user_send = {...user._doc }
+        let user_send = {
+            ...user._doc
+        }
         delete user_send.password;
         return res.json({
             ok: true,
@@ -68,9 +77,13 @@ const createUser = async(req = request, res = response) => {
     }
 }
 
-const updateUser = async(req = request, res) => {
+const updateUser = async (req = request, res) => {
     const id = req.params.id;
-    const { google, email, ...data } = req.body;
+    const {
+        google,
+        email,
+        ...data
+    } = req.body;
     try {
         const find = await User.findById(id);
         if (!find) {
@@ -86,11 +99,18 @@ const updateUser = async(req = request, res) => {
                 const salt = bcrypt.genSaltSync();
                 data.password = bcrypt.hashSync(data.password, salt);
             }
-            const ubigeoData = new Ubigeo(data);
+            const ubigeoData = new Ubigeo(data.ubigeo);
             await ubigeoData.save();
-            const new_user = await User.findByIdAndUpdate(id, {...data, ubigeo: ubigeoData._id }, { new: true });
-            let data_user = {...new_user._doc };
-            delete data_user.password;
+            const new_user = await User.findByIdAndUpdate(id, {
+                ...data,
+                ubigeo: ubigeoData._id
+            }, {
+                new: true
+            });
+            let data_user = {
+                ...new_user._doc
+            };
+            // delete data_user.password;
             return res.status(200).json({
                 ok: true,
                 user: data_user
@@ -106,7 +126,7 @@ const updateUser = async(req = request, res) => {
     }
 }
 
-const deleteUser = async(req = request, res) => {
+const deleteUser = async (req = request, res) => {
     const id = req.params.id;
     try {
         const find = await User.findById(id);
@@ -132,4 +152,7 @@ const deleteUser = async(req = request, res) => {
     }
 }
 
-module.exports = { getUser, updateUser };
+module.exports = {
+    getUser,
+    updateUser
+};

@@ -5,9 +5,16 @@ const User = require('../models/user.model');
 const actualizar = async(req = request, res = response) => {
     const id = req.body.id;
     const nombres = req.body.name;
+    const correo = req.body.email;
     const apellidos = req.body.lastname;
     const dni = req.body.dni;
+    const categoria = req.body.category;
     const password = req.body.password;
+    const direccion = req.body.address;
+    const fecNacimiento = req.body.bornDate;
+    const numeroTel = req.body.phoneNumber;
+    const universidad = req.body.college;
+    const estudios = req.body.studies;
     try{
       const supervisor = await User.findById(id);
       if (!supervisor) {
@@ -19,15 +26,37 @@ const actualizar = async(req = request, res = response) => {
             //Encrypt password
             const salt = bcrypt.genSaltSync();
             const password_enc = bcrypt.hashSync(password, salt);
-            await User.findByIdAndUpdate(id, {name : nombres, lastname : apellidos, dni : dni, password :
-               password_enc}, { new: true }, function(err, supervisor_actualizado){
-            if(!err) {
-              return res.status(200).json({
-                ok: true,
-                user: supervisor_actualizado
-              })
+            if(password == '' && direccion == null && fecNacimiento == null && numeroTel == null && universidad == null && estudios == null){
+                await User.findByIdAndUpdate(id, {name : nombres, lastname : apellidos, dni : dni, category : categoria, email : correo }, { new: true }, function(err, supervisor_actualizado){
+                 if(!err) {
+                   return res.status(200).json({
+                     ok: true,
+                     user: supervisor_actualizado
+                   })
+                 }
+               });
+            } else if((password == '' || password == null) && direccion != null && fecNacimiento != null && numeroTel != null && universidad != null && estudios != null){
+                await User.findByIdAndUpdate(id, {name : nombres, lastname : apellidos, dni : dni, email : correo, address : direccion, 
+                    bornDate : fecNacimiento, phoneNumber : numeroTel, college : universidad, studies : estudios}, { new: true }, function(err, supervisor_actualizado){
+                 if(!err) {
+                   return res.status(200).json({
+                     ok: true,
+                     user: supervisor_actualizado
+                   })
+                 }
+               });
+            } else{
+                await User.findByIdAndUpdate(id, {name : nombres, lastname : apellidos, dni : dni, password :
+                    password_enc, address : direccion, bornDate : fecNacimiento, phoneNumber : numeroTel,
+                     college : universidad, studies : estudios}, { new: true }, function(err, supervisor_actualizado){
+                 if(!err) {
+                   return res.status(200).json({
+                     ok: true,
+                     user: supervisor_actualizado
+                   })
+                 }
+               });
             }
-          });
         }
     } catch (error) {
         console.log(error);

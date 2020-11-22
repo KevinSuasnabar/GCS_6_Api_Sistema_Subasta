@@ -1,18 +1,9 @@
-const {
-    response,
-    request
-} = require('express');
+const { response, request } = require('express');
 const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
-const {
-    generateJWT
-} = require('../helpers/jwt.helper');
-const {
-    verify
-} = require('../helpers/verify-google.helper');
-const {
-    getMenu
-} = require('../helpers/menu-frontend.helper');
+const { generateJWT } = require('../helpers/jwt.helper');
+const { verify } = require('../helpers/verify-google.helper');
+const { getMenu } = require('../helpers/menu-frontend.helper');
 
 const login = async(req = request, res = response) => {
     const {
@@ -102,6 +93,7 @@ const loginGoogle = async(req, res) => {
         return res.status(200).json({
             ok: true,
             token,
+            user: new_user,
             role: data.role
         })
 

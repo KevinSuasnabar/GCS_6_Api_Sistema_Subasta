@@ -66,6 +66,18 @@ const UserSchema = Schema({
         type: Boolean,
         required: false,
         default: false
+    },
+    address: {
+        type: String,
+        required: false,
+    },
+    college: {
+        type: String,
+        required: false,
+    },
+    studies: {
+        type: String,
+        required: false
     }
 
 });

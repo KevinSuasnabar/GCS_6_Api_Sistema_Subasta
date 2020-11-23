@@ -1,11 +1,20 @@
-const { response, request } = require('express');
+const {
+    response,
+    request
+} = require('express');
 const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
-const { generateJWT } = require('../helpers/jwt.helper');
-const { verify } = require('../helpers/verify-google.helper');
-const { getMenu } = require('../helpers/menu-frontend.helper');
+const {
+    generateJWT
+} = require('../helpers/jwt.helper');
+const {
+    verify
+} = require('../helpers/verify-google.helper');
+const {
+    getMenu
+} = require('../helpers/menu-frontend.helper');
 
-const login = async(req = request, res = response) => {
+const login = async (req = request, res = response) => {
     const {
         email,
         password
@@ -17,14 +26,14 @@ const login = async(req = request, res = response) => {
         if (!data) {
             return res.status(401).json({
                 ok: false,
-                message: 'Incorrect credentials.'
+                message: 'Credenciales incorrectas.'
             })
         }
         const validPassword = bcrypt.compareSync(password, data.password);
         if (!validPassword) {
             return res.status(401).json({
                 ok: false,
-                message: 'Incorrect credentials.'
+                message: 'Credenciales incorrectas.'
             });
         }
         if (!data.state) {
@@ -50,7 +59,7 @@ const login = async(req = request, res = response) => {
     }
 }
 
-const loginGoogle = async(req, res) => {
+const loginGoogle = async (req, res) => {
     try {
         if (!req.body.token) {
             return res.status(401).json({
@@ -82,7 +91,8 @@ const loginGoogle = async(req, res) => {
             if (!user.state) {
                 return res.status(400).json({
                     ok: false,
-                    message: 'User disabled'
+                    message: `Tu usuario ha sido deshabilitado, por infringir las normas.
+                     Los detalles de la suspension de tu cuenta estan en el correo enviado a ${user.email}.`
                 });
             }
             new_user = user;

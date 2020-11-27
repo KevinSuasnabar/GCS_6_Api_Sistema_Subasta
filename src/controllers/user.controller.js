@@ -9,7 +9,7 @@ const {
     generateJWT
 } = require('../helpers/jwt.helper');
 
-const getUser = async (req, res) => {
+const getUser = async(req, res) => {
     const id = req.params.id;
     const user = await User.findById(id).populate('ubigeo');
 
@@ -19,7 +19,7 @@ const getUser = async (req, res) => {
     })
 }
 
-const getUsers = async (req, res) => {
+const getUsers = async(req, res) => {
     const since = Number(req.query.since) || 0;
     const to = Number(req.query.to) || 10;
 
@@ -37,7 +37,7 @@ const getUsers = async (req, res) => {
         _id: req._id,
     })
 }
-const createUser = async (req = request, res = response) => {
+const createUser = async(req = request, res = response) => {
     const user = new User(req.body);
     try {
         const current_email = await User.findOne({
@@ -77,7 +77,7 @@ const createUser = async (req = request, res = response) => {
     }
 }
 
-const updateUser = async (req = request, res) => {
+const updateUser = async(req = request, res) => {
     const id = req.params.id;
     const {
         google,
@@ -92,9 +92,9 @@ const updateUser = async (req = request, res) => {
                 message: 'This user does not exist.'
             })
         } else {
-            if (data.firstEntry) {
-                data.firstEntry = false;
-            }
+            // if (data.firstEntry) {
+            //     data.firstEntry = false;
+            // }
             if (data.password) {
                 const salt = bcrypt.genSaltSync();
                 data.password = bcrypt.hashSync(data.password, salt);
@@ -103,7 +103,8 @@ const updateUser = async (req = request, res) => {
             await ubigeoData.save();
             const new_user = await User.findByIdAndUpdate(id, {
                 ...data,
-                ubigeo: ubigeoData._id
+                ubigeo: ubigeoData._id,
+                firstEntry: false
             }, {
                 new: true
             });
@@ -126,7 +127,7 @@ const updateUser = async (req = request, res) => {
     }
 }
 
-const deleteUser = async (req = request, res) => {
+const deleteUser = async(req = request, res) => {
     const id = req.params.id;
     try {
         const find = await User.findById(id);

@@ -75,6 +75,26 @@ const cantidadProductos = async(req = request, res = response) => {
     }
 }
 
+const obtener = async(req = request, res = response) => {
+    const id = req.params.id;
+    try{
+      await Product.findById(id, function(err, producto) {
+        if(!err) {
+          return res.status(200).json({
+            ok: true,
+            product: producto
+                })
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            message: 'Error al obtener datos.'
+        })
+    }
+}
 
 
-module.exports = { addProduct, getProductsByUser, listarProductoPorCategoria, cantidadProductos };
+
+module.exports = { addProduct, getProductsByUser, listarProductoPorCategoria, cantidadProductos, obtener };

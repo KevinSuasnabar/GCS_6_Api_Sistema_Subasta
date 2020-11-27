@@ -4,8 +4,14 @@ const fs = require('fs');
 const cloudinary = require('cloudinary').v2;
 
 const uploadPhoto = async(req = request, res = response) => {
+    cloudinary.config({ 
+        cloud_name: 'ram123', 
+        api_key: '715658449355985', 
+        api_secret: 'W4gZhoBuS5GXwmZmvUqB06pg-XU' 
+      });
     const id = req.params.id;
     const user = await User.findById(id);
+    console.log(req.files.photo);
     let url = "";
     try {
         if (!user) {

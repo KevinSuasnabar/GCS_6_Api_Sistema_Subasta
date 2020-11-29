@@ -19,6 +19,7 @@ app.use('/api/product', require('./routes/product.route'));
 app.use('/api/supervisor', require('./routes/supervisor.route'));
 app.use('/api/cliente', require('./routes/cliente.route'));
 app.use('/api/admin', require('./routes/admin.route'));
+app.use('/api/ubigeo', require('./routes/ubigeo.route'));
 
 app.listen(process.env.PORT, () => {
     console.log(`Server run in port ${process.env.PORT}`);

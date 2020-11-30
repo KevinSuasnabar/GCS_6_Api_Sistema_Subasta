@@ -19,7 +19,7 @@ const getUser = async(req, res) => {
     })
 }
 
-const getUsers = async(req, res) => {
+const getUsers = async(req, res) => { 
     const since = Number(req.query.since) || 0;
     const to = Number(req.query.to) || 10;
 

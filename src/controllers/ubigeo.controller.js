@@ -7,7 +7,7 @@ const listarDepartamentos = async(req = request, res = response) => {
             if (!err) {
                 return res.status(200).json({
                     ok: true,
-                    user: departamento
+                    departaments: departamento
                 })
             }
         });
@@ -27,7 +27,7 @@ const listarProvincias = async(req = request, res = response) => {
             if (!err) {
                 return res.status(200).json({
                     ok: true,
-                    user: provincias
+                    province: provincias
                 })
             }
         });
@@ -48,7 +48,7 @@ const listarDistritos = async(req = request, res = response) => {
             if (!err) {
                 return res.status(200).json({
                     ok: true,
-                    user: distritos
+                    disctrit: distritos
                 })
             }
         });

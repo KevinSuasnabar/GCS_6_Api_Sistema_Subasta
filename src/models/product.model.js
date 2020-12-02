@@ -22,6 +22,14 @@ const ProductSchema = Schema({
         type: [String],
         required: false
     },
+    motivo_rechazo: {
+        type: String,
+        required: false
+    },
+    motivo_subsanacion: {
+        type: String,
+        required: false
+    },
     user: {
         required: true,
         type: Schema.Types.ObjectId,

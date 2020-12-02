@@ -1,7 +1,7 @@
 const { response, request } = require('express');
 const User = require('../models/user.model');
 const fs = require('fs');
-const cloudinary = require('cloudinary').v2;
+const cloudinary = require('../cloudinary/config');
 
 const uploadPhoto = async(req = request, res = response) => {
     const id = req.params.id;

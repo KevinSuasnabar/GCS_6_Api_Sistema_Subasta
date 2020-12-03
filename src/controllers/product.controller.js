@@ -1,6 +1,7 @@
 const { response, request } = require('express');
 const Product = require('../models/product.model');
 const estados = require('../constantes/estados');
+const socket = require('../app');
 
 const addProduct = async(req = request, res) => {
     const user = req._id;
@@ -110,6 +111,7 @@ const actualizarEstado = async(req = request, res = response) => {
                     message: 'Producto no existe.'
                 })
             } else {
+                //para aprobar
                 if(state == estados[1]){
                     await Product.findByIdAndUpdate(id, { state: state }, { new: true }, function(err, producto_actualizado) {
                         if (!err) {
@@ -119,6 +121,7 @@ const actualizarEstado = async(req = request, res = response) => {
                             })
                         }
                     });
+                //para rechazar
                 }else if(state == estados[2]){
                     await Product.findByIdAndUpdate(id, { state: state, motivo_rechazo: motivo_rechazo }, { new: true }, function(err, producto_actualizado) {
                         if (!err) {
@@ -128,7 +131,9 @@ const actualizarEstado = async(req = request, res = response) => {
                             })
                         }
                     });
+                //para pedir al cliente que subsane
                 }else if(state == estados[3]){
+                    socket.io.emit('actualiza', 'me actualizaron');
                     await Product.findByIdAndUpdate(id, { state: state, motivo_subsanacion: motivo_subsanacion }, { new: true }, function(err, producto_actualizado) {
                         if (!err) {
                             return res.status(200).json({

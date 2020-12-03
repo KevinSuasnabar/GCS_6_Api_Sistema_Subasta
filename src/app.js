@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const socket = require('socket.io');
 const cors = require('cors');
 const path = require('path');
 const { dbConnection } = require('./database/config');
@@ -21,6 +22,22 @@ app.use('/api/cliente', require('./routes/cliente.route'));
 app.use('/api/admin', require('./routes/admin.route'));
 app.use('/api/ubigeo', require('./routes/ubigeo.route'));
 
-app.listen(process.env.PORT, () => {
+
+const server = app.listen(process.env.PORT, () => {
     console.log(`Server run in port ${process.env.PORT}`);
 })
+
+const io = socket(server, {
+    cors: {
+        origin: '*'
+    }
+})
+
+exports.io = io;
+
+/*
+io.on('connection', function(socket){
+    console.log('usuario socket conectado');
+    socket.emit('test event', 'socket funcionando');
+})
+*/

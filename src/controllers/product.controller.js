@@ -1,5 +1,6 @@
 const { response, request } = require('express');
 const Product = require('../models/product.model');
+const ProductoHistorial = require('../models/productoHistorial.model');
 const estados = require('../constantes/estados');
 const socket = require('../app');
 
@@ -8,10 +9,17 @@ const addProduct = async(req = request, res) => {
     const data = req.body;
     try {
         const product = new Product({...data, user });
-        await product.save()
-        return res.status(200).json({
-            ok: true,
-            product
+        await product.save(function(err, producto){
+            if(!err){
+                ProductoHistorial.create({user: producto.user, producto: producto._id, state : producto.state}, function(err){
+                    if(!err){
+                        return res.status(200).json({
+                            ok: true,
+                            product : producto
+                        })
+                    }
+                })
+            }
         })
     } catch (error) {
         return res.status(500).json({
@@ -38,7 +46,6 @@ const getProductsByUser = async(req = request, res) => {
 
 const listarProductoPorCategoria = async(req = request, res = response) => {
     const category = req.params.category;
-    console.log(category);
     try {
         await Product.find({$and: [{category: category}, {$or: [{state: estados[0]}, {state: estados[3]}, {state: estados[4]}]}]}, function(err, categoria) {
             if (!err) {
@@ -55,6 +62,22 @@ const listarProductoPorCategoria = async(req = request, res = response) => {
             message: 'Error al obtener datos.'
         })
     }
+}
+
+const listarProductosYClientes = async(req = request, res = response) => {
+    const category = req.params.category;
+    try {
+        const products = await Product.find({category: category}).populate('user');
+        return res.status(200).json({
+            ok: true,
+            products
+        })
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            error
+        })
+    } 
 }
 
 const cantidadProductos = async(req = request, res = response) => {
@@ -104,6 +127,7 @@ const actualizarEstado = async(req = request, res = response) => {
     const motivo_subsanacion = req.body.motivo_subsanacion;
     try {
         const producto = await Product.findById(id);
+        console.log(producto.user);
         if (producto)
             if (!producto) {
                 return res.status(404).json({
@@ -115,9 +139,13 @@ const actualizarEstado = async(req = request, res = response) => {
                 if(state == estados[1]){
                     await Product.findByIdAndUpdate(id, { state: state }, { new: true }, function(err, producto_actualizado) {
                         if (!err) {
-                            return res.status(200).json({
-                                ok: true,
-                                producto: producto_actualizado
+                            ProductoHistorial.create({user: producto_actualizado.user, producto: producto_actualizado._id, state : producto_actualizado.state}, function(err){
+                                if(!err){
+                                    return res.status(200).json({
+                                        ok: true,
+                                        producto: producto_actualizado
+                                    })
+                                }
                             })
                         }
                     });
@@ -125,20 +153,28 @@ const actualizarEstado = async(req = request, res = response) => {
                 }else if(state == estados[2]){
                     await Product.findByIdAndUpdate(id, { state: state, motivo_rechazo: motivo_rechazo }, { new: true }, function(err, producto_actualizado) {
                         if (!err) {
-                            return res.status(200).json({
-                                ok: true,
-                                producto: producto_actualizado
+                            ProductoHistorial.create({user: producto_actualizado.user, producto: producto_actualizado._id, state : producto_actualizado.state, accion: producto_actualizado.motivo_rechazo}, function(err){
+                                if(!err){
+                                    return res.status(200).json({
+                                        ok: true,
+                                        producto: producto_actualizado
+                                    })
+                                }
                             })
                         }
                     });
                 //para pedir al cliente que subsane
                 }else if(state == estados[3]){
-                    socket.io.emit('actualiza', 'me actualizaron');
+                   // socket.io.emit('actualiza', 'me actualizaron');
                     await Product.findByIdAndUpdate(id, { state: state, motivo_subsanacion: motivo_subsanacion }, { new: true }, function(err, producto_actualizado) {
                         if (!err) {
-                            return res.status(200).json({
-                                ok: true,
-                                producto: producto_actualizado
+                            ProductoHistorial.create({user: producto_actualizado.user, producto: producto_actualizado._id, state : producto_actualizado.state, accion: producto_actualizado.motivo_subsanacion}, function(err){
+                                if(!err){
+                                    return res.status(200).json({
+                                        ok: true,
+                                        producto: producto_actualizado
+                                    })
+                                }
                             })
                         }
                     });
@@ -154,4 +190,20 @@ const actualizarEstado = async(req = request, res = response) => {
     }
 }
 
-module.exports = { addProduct, getProductsByUser, listarProductoPorCategoria, cantidadProductos, obtener, actualizarEstado };
+const obtenerHistorial = async(req = request, res) => {
+    const id = req.params.id;
+    try {
+        const historial_producto = await ProductoHistorial.find({producto: id}).populate('user').populate('producto');
+        return res.status(200).json({
+            ok: true,
+            historial_producto
+        })
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            error
+        })
+    }
+}
+
+module.exports = { addProduct, getProductsByUser, listarProductoPorCategoria, cantidadProductos, obtener, actualizarEstado, listarProductosYClientes, obtenerHistorial };

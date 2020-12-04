@@ -3,7 +3,7 @@
 */
 
 const { Router } = require('express');
-const { addProduct, getProductsByUser, listarProductoPorCategoria, cantidadProductos, obtener, actualizarEstado } = require('../controllers/product.controller');
+const { addProduct, getProductsByUser, listarProductoPorCategoria, cantidadProductos, obtener, actualizarEstado, listarProductosYClientes, obtenerHistorial } = require('../controllers/product.controller');
 const { validationJWT } = require('../middlewares/validation-jwt.middleware');
 const router = Router();
 
@@ -13,5 +13,7 @@ router.get('/listarPorCategoria/:category', [validationJWT], listarProductoPorCa
 router.get('/cantidad', [validationJWT], cantidadProductos);
 router.get('/obtener/:id', [validationJWT], obtener);
 router.put('/actualizarEstado', [validationJWT], actualizarEstado);
+router.get('/listarProductosyClientes/:category', [validationJWT], listarProductosYClientes);
+router.get('/historial/:id', [validationJWT], obtenerHistorial);
 
-module.exports = router;
+module.exports = router; 

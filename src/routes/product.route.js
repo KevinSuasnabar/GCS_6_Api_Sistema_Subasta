@@ -13,7 +13,7 @@ router.get('/listarPorCategoria/:category', [validationJWT], listarProductoPorCa
 router.get('/cantidad', [validationJWT], cantidadProductos);
 router.get('/obtener/:id', [validationJWT], obtener);
 router.put('/actualizarEstado', [validationJWT], actualizarEstado);
-router.get('/listarProductosyClientes/:category', [validationJWT], listarProductosYClientes);
+router.get('/listarProductosyClientes/:category/:filter', [validationJWT], listarProductosYClientes);
 router.get('/historial/:id', [validationJWT], obtenerHistorial);
 
 module.exports = router; 

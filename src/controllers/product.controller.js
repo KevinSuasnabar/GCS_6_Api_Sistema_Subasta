@@ -66,12 +66,32 @@ const listarProductoPorCategoria = async(req = request, res = response) => {
 
 const listarProductosYClientes = async(req = request, res = response) => {
     const category = req.params.category;
+    const filter = req.params.filter;
+    var filtro_producto = [];
+    var k = 0;
     try {
-        const products = await Product.find({category: category}).populate('user');
-        return res.status(200).json({
-            ok: true,
-            products
-        })
+        await Product.find({category: category}).populate('user').exec(function(err, productos) {
+            console.log(productos[0].user.name);
+            if(filter == 'all'){
+                return res.status(200).json({
+                    ok: true,
+                    products : productos
+                })
+            }else{
+                for(i in productos){
+                     if(productos[i].user.dni == filter){
+                         filtro_producto[k] = productos[i];
+                         k++;
+                     }
+                }
+                 return res.status(200).json({
+                     ok: true,
+                     products : filtro_producto
+                 })
+            }
+
+        });
+
     } catch (error) {
         return res.status(500).json({
             ok: false,

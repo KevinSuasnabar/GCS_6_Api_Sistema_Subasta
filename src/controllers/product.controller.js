@@ -13,6 +13,7 @@ const addProduct = async(req = request, res) => {
             if(!err){
                 ProductoHistorial.create({user: producto.user, producto: producto._id, state : producto.state}, function(err){
                     if(!err){
+                        socket.io.emit('producto_nuevo', {product : producto});
                         return res.status(200).json({
                             ok: true,
                             product : producto
@@ -71,7 +72,6 @@ const listarProductosYClientes = async(req = request, res = response) => {
     var k = 0;
     try {
         await Product.find({category: category}).populate('user').exec(function(err, productos) {
-            console.log(productos[0].user.name);
             if(filter == 'all'){
                 return res.status(200).json({
                     ok: true,
@@ -185,7 +185,6 @@ const actualizarEstado = async(req = request, res = response) => {
                     });
                 //para pedir al cliente que subsane
                 }else if(state == estados[3]){
-                   // socket.io.emit('actualiza', 'me actualizaron');
                     await Product.findByIdAndUpdate(id, { state: state, motivo_subsanacion: motivo_subsanacion }, { new: true }, function(err, producto_actualizado) {
                         if (!err) {
                             ProductoHistorial.create({user: producto_actualizado.user, producto: producto_actualizado._id, state : producto_actualizado.state, accion: producto_actualizado.motivo_subsanacion}, function(err){

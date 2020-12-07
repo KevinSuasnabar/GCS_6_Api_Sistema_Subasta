@@ -90,7 +90,7 @@ const uploadPhotoProduct = async(req = request, res = response) => {
             if (!extensions_valids.includes(extension)) {
                 return res.status(400).json({
                     ok: false,
-                    message: `Extension no valid in ${photo.name}`
+                    message: `Extensión no valido en ${photo.name}`
                 })
             }
         })
@@ -130,7 +130,7 @@ const uploadPhotoProduct = async(req = request, res = response) => {
     } catch (error) {
         return res.status(500).json({
             ok: false,
-            message: 'Error, please check logs.'
+            message: 'Error, por favor revisa los logs.'
         })
     }
 }

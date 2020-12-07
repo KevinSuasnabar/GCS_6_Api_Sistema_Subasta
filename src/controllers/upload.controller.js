@@ -130,7 +130,7 @@ const uploadPhotoProduct = async(req = request, res = response) => {
     } catch (error) {
         return res.status(500).json({
             ok: false,
-            message: 'Error, please check logs.'
+            message: 'Error, por favor revisa los logs.'
         })
     }
 }

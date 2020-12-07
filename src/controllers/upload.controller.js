@@ -59,7 +59,7 @@ const uploadPhoto = async(req = request, res = response) => {
 
         return res.status(200).json({
             ok: true,
-            message: 'File updated.',
+            message: 'Archivo subido.',
             data: url
         })
     } catch (error) {

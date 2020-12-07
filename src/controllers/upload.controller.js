@@ -122,7 +122,7 @@ const uploadPhotoProduct = async(req = request, res = response) => {
                 clearInterval(inter)
                 return res.status(200).json({
                     ok: true,
-                    message: 'Files updated.',
+                    message: 'Archivos subidos.',
                     urls
                 })
             }

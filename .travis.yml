@@ -1,3 +1,10 @@
 language: node_js
 node_js: 
   - 12.11.0
+addons:
+  sonarcloud:
+    organization: "kevinsuasnabar" # To find your organization, go to: https://sonarcloud.io/account/organizations
+
+script:
+  # Put before sonar-scanner your other script steps
+  - sonar-scanner -Dsonar.verbose=true -X  

@@ -21,6 +21,7 @@ app.use('/api/supervisor', require('./routes/supervisor.route'));
 app.use('/api/cliente', require('./routes/cliente.route'));
 app.use('/api/admin', require('./routes/admin.route'));
 app.use('/api/ubigeo', require('./routes/ubigeo.route'));
+app.use('/api/subasta', require('./routes/subasta.route'));
 
 
 const server = app.listen(process.env.PORT, () => {

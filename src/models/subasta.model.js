@@ -1,15 +1,10 @@
 const { Schema, model } = require('mongoose');
 
 const SubastaSchema = Schema({
-    codigo: {
+    titulo: {
         type: String,
         required: true
     },
-    // user: {
-    //     required: true,
-    //     type: Schema.Types.ObjectId,
-    //     ref: 'User'
-    // },
     producto: {
         required: true,
         type: Schema.Types.ObjectId,

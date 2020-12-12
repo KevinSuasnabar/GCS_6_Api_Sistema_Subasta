@@ -267,4 +267,26 @@ const getProductsByState = async(req = request, res) => {
 
 }
 
-module.exports = { addProduct, getProductsByUser, listarProductoPorCategoria, cantidadProductos, obtener, actualizarEstado, listarProductosYClientes, obtenerHistorial, getProductsByState };
+const filtrarProductosByUserAndNameOrState = async(req = request, res) => {
+    const id = req._id;
+    const filter = req.params.filter;
+    var products = [];
+    try {
+        if(filter == 'all'){
+            products = await Product.find({ user: id });
+        }else{
+            products = await Product.find({$and: [{ user: id }, {$or: [{name: {$regex: '.*' + filter + '.*', $options:'i'}}, {state: {$regex: '.*' + filter + '.*', $options:'i'}}]}]});
+        }
+        return res.status(200).json({
+            ok: true,
+            products
+        })
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            error
+        })
+    }
+}
+
+module.exports = { addProduct, getProductsByUser, listarProductoPorCategoria, cantidadProductos, obtener, actualizarEstado, listarProductosYClientes, obtenerHistorial, getProductsByState, filtrarProductosByUserAndNameOrState};

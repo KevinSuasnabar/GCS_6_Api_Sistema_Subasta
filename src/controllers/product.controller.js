@@ -157,11 +157,12 @@ const actualizarEstado = async(req = request, res = response) => {
                 })
             } else {
                 //para aprobar
-                if (state == estados[1]) {
+                if (state == estados[1]) {//aca
                     await Product.findByIdAndUpdate(id, { state: state }, { new: true }, function(err, producto_actualizado) {
                         if (!err) {
                             ProductoHistorial.create({ user: producto_actualizado.user, producto: producto_actualizado._id, state: producto_actualizado.state }, function(err) {
                                 if (!err) {
+                                    socket.io.emit('estado_actualizado', { product: producto_actualizado });
                                     return res.status(200).json({
                                         ok: true,
                                         producto: producto_actualizado
@@ -176,6 +177,7 @@ const actualizarEstado = async(req = request, res = response) => {
                         if (!err) {
                             ProductoHistorial.create({ user: producto_actualizado.user, producto: producto_actualizado._id, state: producto_actualizado.state, accion: producto_actualizado.motivo_rechazo }, function(err) {
                                 if (!err) {
+                                    socket.io.emit('estado_actualizado', { product: producto_actualizado });
                                     return res.status(200).json({
                                         ok: true,
                                         producto: producto_actualizado
@@ -190,6 +192,7 @@ const actualizarEstado = async(req = request, res = response) => {
                         if (!err) {
                             ProductoHistorial.create({ user: producto_actualizado.user, producto: producto_actualizado._id, state: producto_actualizado.state, accion: producto_actualizado.motivo_subsanacion }, function(err) {
                                 if (!err) {
+                                    socket.io.emit('estado_actualizado', { product: producto_actualizado });
                                     return res.status(200).json({
                                         ok: true,
                                         producto: producto_actualizado

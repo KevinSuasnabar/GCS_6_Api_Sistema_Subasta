@@ -7,4 +7,4 @@ addons:
 
 script:
   # Put before sonar-scanner your other script steps
-  - sonar-scanner -Dsonar.verbose=true -X  
+  - sonar-scanner -Dsonar.verbose=true -X 

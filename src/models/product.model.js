@@ -22,6 +22,15 @@ const ProductSchema = Schema({
         type: [String],
         required: false
     },
+    fecha_registro: {
+        type: Date,
+        default: Date.now,
+        require: true
+    },
+    fecha_actualizacion: {
+        type: Date,
+        require: false
+    },
     motivo_rechazo: {
         type: String,
         required: false

@@ -12,7 +12,7 @@ const addProduct = async(req = request, res) => {
         const product = new Product({...data, user });
         await product.save(function(err, producto) {
             if (!err) {
-                ProductoHistorial.create({ user: producto.user, producto: producto._id, state: producto.state }, function(err) {
+                ProductoHistorial.create({ user: producto.user, producto: producto._id, state: producto.state, fecha_accion: new Date()}, function(err) {
                     if (!err) {
                         socket.io.emit('producto_nuevo', { product: producto });
                         return res.status(200).json({
@@ -144,6 +144,8 @@ const obtener = async(req = request, res = response) => {
 const actualizarEstado = async(req = request, res = response) => {
     const id = req.body.id;
     const state = req.body.state;
+    const name = req.body.name;
+    const lastname = req.body.lastname;
     const motivo_rechazo = req.body.motivo_rechazo;
     const motivo_subsanacion = req.body.motivo_subsanacion;
     try {
@@ -160,7 +162,7 @@ const actualizarEstado = async(req = request, res = response) => {
                 if (state == estados[1]) {//aca
                     await Product.findByIdAndUpdate(id, { state: state }, { new: true }, function(err, producto_actualizado) {
                         if (!err) {
-                            ProductoHistorial.create({ user: producto_actualizado.user, producto: producto_actualizado._id, state: producto_actualizado.state }, function(err) {
+                            ProductoHistorial.create({ user: producto_actualizado.user, producto: producto_actualizado._id, state: producto_actualizado.state, fecha_accion: new Date(), supervisor_name: name, supervisor_lastname: lastname }, function(err) {
                                 if (!err) {
                                     socket.io.emit('estado_actualizado', { product: producto_actualizado });
                                     return res.status(200).json({
@@ -175,7 +177,7 @@ const actualizarEstado = async(req = request, res = response) => {
                 } else if (state == estados[2]) {
                     await Product.findByIdAndUpdate(id, { state: state, motivo_rechazo: motivo_rechazo }, { new: true }, function(err, producto_actualizado) {
                         if (!err) {
-                            ProductoHistorial.create({ user: producto_actualizado.user, producto: producto_actualizado._id, state: producto_actualizado.state, accion: producto_actualizado.motivo_rechazo }, function(err) {
+                            ProductoHistorial.create({ user: producto_actualizado.user, producto: producto_actualizado._id, state: producto_actualizado.state, accion: producto_actualizado.motivo_rechazo, fecha_accion: new Date(), supervisor_name: name, supervisor_lastname: lastname }, function(err) {
                                 if (!err) {
                                     socket.io.emit('estado_actualizado', { product: producto_actualizado });
                                     return res.status(200).json({
@@ -190,7 +192,7 @@ const actualizarEstado = async(req = request, res = response) => {
                 } else if (state == estados[3]) {
                     await Product.findByIdAndUpdate(id, { state: state, motivo_subsanacion: motivo_subsanacion }, { new: true }, function(err, producto_actualizado) {
                         if (!err) {
-                            ProductoHistorial.create({ user: producto_actualizado.user, producto: producto_actualizado._id, state: producto_actualizado.state, accion: producto_actualizado.motivo_subsanacion }, function(err) {
+                            ProductoHistorial.create({ user: producto_actualizado.user, producto: producto_actualizado._id, state: producto_actualizado.state, accion: producto_actualizado.motivo_subsanacion, fecha_accion: new Date(), supervisor_name: name, supervisor_lastname: lastname }, function(err) {
                                 if (!err) {
                                     socket.io.emit('estado_actualizado', { product: producto_actualizado });
                                     return res.status(200).json({

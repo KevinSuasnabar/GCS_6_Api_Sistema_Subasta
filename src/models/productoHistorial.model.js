@@ -18,6 +18,18 @@ const ProductoHistorialSchema = Schema({
     accion: {
         type: String,
         required: false
+    }, 
+    fecha_accion: {
+        type: Date,
+        require: true
+    },
+    supervisor_name:{
+        type: String,
+        required: false
+    },
+    supervisor_lastname:{
+        type: String,
+        required: false
     }
 });
 

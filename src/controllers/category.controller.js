@@ -1,7 +1,6 @@
 const { response, request } = require('express');
 const Category = require('../models/category.model');
 
-
 const getCategories = async(req, res) => {
     try {
         const categories = await Category.find();

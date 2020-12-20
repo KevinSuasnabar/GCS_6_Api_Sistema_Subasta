@@ -62,10 +62,11 @@ const updateProduct = async (req = request, res) => {
         producto.description = data.description;
         producto.category = data.category;
         producto.state = data.state;
-        producto.imgs = data.imgs;
+        if(data.imgs && data.imgs.length>=3){
+            producto.imgs = data.imgs;
+        }
 
         await producto.save((err, productoModificado) => {
-
             if (!err) {
                 ProductoHistorial.create({
                     user: productoModificado.user,
@@ -138,7 +139,6 @@ const listarProductoPorCategoria = async (req = request, res = response) => {
             }
         });
     } catch (error) {
-        console.log(error);
         return res.status(500).json({
             ok: false,
             message: 'Error al obtener datos.'

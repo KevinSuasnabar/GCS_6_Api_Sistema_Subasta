@@ -9,8 +9,8 @@ const sendEmail = async(emails, asunto, texto) => {
             port: 465,
             secure: true, // true for 465, false for other ports
             auth: {
-                user: 'pedro.subaston@gmail.com', // generated ethereal user
-                pass: 'subaston2020', // generated ethereal password
+                user: process.env.USER, // generated ethereal user
+                pass: process.env.PASSWORD // generated ethereal password
             },
         });
         let info = await transporter.sendMail({

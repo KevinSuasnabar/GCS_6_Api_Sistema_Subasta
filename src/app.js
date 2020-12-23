@@ -26,7 +26,7 @@ app.use('/api/subasta', require('./routes/subasta.route'));
 const { sendEmail } = require('./helpers/email.helper');
 
 // sendEmail(['raul9702sulca@gmail.com', 'raul.sulca3@unmsm.edu.pe', 'raulsulcap@gmail.com'], 'Prueba', 'Raaaaaaaaaaaaaaaaaa')
-sendEmail(['luis.vilchez8@unmsm.edu.pe'], 'Q pasa causa?', 'Gaaaaaaaaaaaaaaaaaa')
+sendEmail(['raul.sulca3@unmsm.edu.pe'], 'Prueba', 'De entorno')
 
 const server = app.listen(process.env.PORT, () => {
     console.log(`Server run in port ${process.env.PORT}`);

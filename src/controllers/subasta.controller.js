@@ -5,10 +5,17 @@ const Product = require('../models/product.model');
 const createSubasta = async(req = request, res) => {
     try {
         const tipos = ['INGLESA', 'HOLANDESA'];
+        const modos = ['ASYNC', 'SINC'];
         const id_producto = req.params.idProducto;;
         const data_subasta = req.body;
         const prod = await Product.findById(id_producto);
         if (prod.state !== 'APROBADO') {
+            if (prod.state === 'EN SUBASTA') {
+                return res.status(400).json({
+                    ok: false,
+                    message: 'Producto ya está en subasta.'
+                })
+            }
             return res.status(400).json({
                 ok: false,
                 message: 'Producto aún en revisión.'
@@ -20,10 +27,18 @@ const createSubasta = async(req = request, res) => {
                 message: 'Tipo de subasta inexistente.'
             })
         }
+        if (!modos.includes(data_subasta.modo)) {
+            return res.status(400).json({
+                ok: false,
+                message: 'Modo de subasta inexistente.'
+            })
+        }
         const subasta_aux = new Subasta({
             ...data_subasta,
             producto: id_producto
         });
+        prod.state = 'EN SUBASTA';
+        await prod.save();
         const subasta = await subasta_aux.save();
         if (subasta) {
             return res.status(200).json({
@@ -44,5 +59,26 @@ const createSubasta = async(req = request, res) => {
     }
 }
 
+const getSubastas = async(req = request, res = response) => {
+    const subastas = await Subasta.find().populate('producto');
+    return res.status(200).json({
+        ok: true,
+        data: subastas
+    })
+}
 
-module.exports = { createSubasta };
+const getSubastaById = async(req = request, res = response) => {
+    const id = req.params.id;
+    const subasta = await Subasta.findById(id).populate('producto');
+    if (!subasta) {
+        return res.status(404).json({
+            ok: false,
+            message: 'Subasta no encontrada'
+        })
+    }
+    return res.status(200).json({
+        ok: true,
+        data: subasta
+    })
+}
+module.exports = { createSubasta, getSubastas, getSubastaById };

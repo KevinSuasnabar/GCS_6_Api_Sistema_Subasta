@@ -24,6 +24,11 @@ const SubastaSchema = Schema({
         required: true
             //INGLESA - HOLANDESA
     },
+    modo: {
+        type: String,
+        required: true
+            //ASYNC:CON TIEMPO - SINC:AL MOMENTO
+    },
     fecha_inicio: {
         type: Date,
         required: false

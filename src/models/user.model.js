@@ -29,7 +29,7 @@ const UserSchema = Schema({
     role: {
         type: String,
         required: false,
-        default: "CLIENT_ROLE" 
+        default: "CLIENT_ROLE"
     },
     card: {
         type: String,

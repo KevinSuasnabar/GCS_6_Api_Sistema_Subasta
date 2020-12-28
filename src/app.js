@@ -23,6 +23,10 @@ app.use('/api/admin', require('./routes/admin.route'));
 app.use('/api/ubigeo', require('./routes/ubigeo.route'));
 app.use('/api/subasta', require('./routes/subasta.route'));
 
+const { sendEmail } = require('./helpers/email.helper');
+
+// sendEmail(['raul9702sulca@gmail.com', 'raul.sulca3@unmsm.edu.pe', 'raulsulcap@gmail.com'], 'Prueba', 'Raaaaaaaaaaaaaaaaaa')
+// sendEmail(['raul.sulca3@unmsm.edu.pe'], 'Prueba', 'De entorno')
 
 const server = app.listen(process.env.PORT, () => {
     console.log(`Server run in port ${process.env.PORT}`);

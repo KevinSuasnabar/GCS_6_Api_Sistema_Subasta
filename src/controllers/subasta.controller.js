@@ -6,7 +6,7 @@ const createSubasta = async(req = request, res) => {
     try {
         const tipos = ['INGLESA', 'HOLANDESA'];
         const modos = ['ASYNC', 'SINC'];
-        const id_producto = req.params.idProducto;;
+        const id_producto = req.params.idProducto;
         const data_subasta = req.body;
         const prod = await Product.findById(id_producto);
         if (prod.state !== 'APROBADO') {
@@ -60,25 +60,39 @@ const createSubasta = async(req = request, res) => {
 }
 
 const getSubastas = async(req = request, res = response) => {
-    const subastas = await Subasta.find().populate('producto');
-    return res.status(200).json({
-        ok: true,
-        data: subastas
-    })
+    try {
+        const subastas = await Subasta.find().populate('producto');
+        return res.status(200).json({
+            ok: true,
+            data: subastas
+        })
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            error
+        })
+    }
 }
 
 const getSubastaById = async(req = request, res = response) => {
-    const id = req.params.id;
-    const subasta = await Subasta.findById(id).populate('producto');
-    if (!subasta) {
-        return res.status(404).json({
+    try {
+        const id = req.params.id;
+        const subasta = await Subasta.findById(id).populate('producto');
+        if (!subasta) {
+            return res.status(404).json({
+                ok: false,
+                message: 'Subasta no encontrada'
+            })
+        }
+        return res.status(200).json({
+            ok: true,
+            data: subasta
+        })
+    } catch (error) {
+        return res.status(500).json({
             ok: false,
-            message: 'Subasta no encontrada'
+            error
         })
     }
-    return res.status(200).json({
-        ok: true,
-        data: subasta
-    })
 }
 module.exports = { createSubasta, getSubastas, getSubastaById };

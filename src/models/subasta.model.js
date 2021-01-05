@@ -29,6 +29,14 @@ const SubastaSchema = Schema({
         required: true
             //ASYNC:CON TIEMPO - SINC:AL MOMENTO
     },
+    hora_inicio: {
+        type: Date,
+        required: false
+    },
+    hora_fin: {
+        type: Date,
+        required: false
+    },
     fecha_inicio: {
         type: Date,
         required: false
@@ -40,6 +48,15 @@ const SubastaSchema = Schema({
     precio_base: {
         type: Number,
         required: true
+    },
+    precio_minimo: {
+        type: Number,
+        required: false
+    },
+    puja: {
+        type: Number,
+        default: 0
     }
-});
+
+}, { timestamps: true });
 module.exports = model('Subasta', SubastaSchema);

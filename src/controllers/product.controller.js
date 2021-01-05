@@ -5,8 +5,9 @@ const {
 const Product = require('../models/product.model');
 const User = require('../models/user.model');
 const ProductoHistorial = require('../models/productoHistorial.model');
-const estados = require('../constantes/estados');
+const estadosProducto = require('../constantes/estadosProducto');
 const socket = require('../app');
+const { sendEmail } = require('../helpers/email.helper');
 
 const addProduct = async (req = request, res) => {
     const user = req._id;
@@ -16,6 +17,7 @@ const addProduct = async (req = request, res) => {
             ...data,
             user
         });
+        const supervisores = await User.find({category : data.category})
         await product.save(function (err, producto) {
             if (!err) {
                 ProductoHistorial.create({
@@ -25,6 +27,9 @@ const addProduct = async (req = request, res) => {
                     fecha_accion: new Date()
                 }, function (err) {
                     if (!err) {
+                         supervisores.forEach(sup => {
+                            sendEmail(sup.email, 'Producto ' + producto.name +  ' por revisar', 'Estimado ' + sup.name + ' tiene un artículo por revisar')
+                        })
                         socket.io.emit('producto_nuevo', {
                             product: producto
                         });
@@ -66,6 +71,7 @@ const updateProduct = async (req = request, res) => {
             producto.imgs = data.imgs;
         }
 
+        const supervisores = await User.find({category : data.category})
         await producto.save((err, productoModificado) => {
             if (!err) {
                 ProductoHistorial.create({
@@ -75,6 +81,9 @@ const updateProduct = async (req = request, res) => {
                     fecha_accion: new Date()
                 }, function (err) {
                     if (!err) {
+                        supervisores.forEach(sup => {
+                            sendEmail(sup.email, 'Producto ' + producto.name +  ' subsanado', 'Estimado ' + sup.name + ' tiene un artículo por revisar')
+                        })
                         socket.io.emit('producto_nuevo', {
                             product: productoModificado
                         });
@@ -95,8 +104,6 @@ const updateProduct = async (req = request, res) => {
         })
     }
 }
-
-
 
 const getProductsByUser = async (req = request, res) => {
     try {
@@ -123,11 +130,11 @@ const listarProductoPorCategoria = async (req = request, res = response) => {
                 category: category
             }, {
                 $or: [{
-                    state: estados[0]
+                    state: estadosProducto[0]
                 }, {
-                    state: estados[3]
+                    state: estadosProducto[3]
                 }, {
-                    state: estados[4]
+                    state: estadosProducto[4]
                 }]
             }]
         }, function (err, categoria) {
@@ -232,7 +239,9 @@ const actualizarEstado = async (req = request, res = response) => {
     const motivo_subsanacion = req.body.motivo_subsanacion;
     try {
         const producto = await Product.findById(id);
-        console.log(producto.user);
+        console.log(producto)
+        const usuario =  await User.findById(producto.user);
+        console.log(usuario)
         if (producto)
             if (!producto) {
                 return res.status(404).json({
@@ -241,7 +250,7 @@ const actualizarEstado = async (req = request, res = response) => {
                 })
             } else {
                 //para aprobar
-                if (state == estados[1]) { //aca
+                if (state == estadosProducto[1]) { //aca
                     await Product.findByIdAndUpdate(id, {
                         state: state
                     }, {
@@ -257,6 +266,7 @@ const actualizarEstado = async (req = request, res = response) => {
                                 supervisor_lastname: lastname
                             }, function (err) {
                                 if (!err) {
+                                    sendEmail(usuario.email, 'Producto ' + producto.name +  ' aprobado', 'Estimado ' + usuario.name + ' su artículo ha sido aprobado')
                                     socket.io.emit('estado_actualizado', {
                                         product: producto_actualizado
                                     });
@@ -269,7 +279,7 @@ const actualizarEstado = async (req = request, res = response) => {
                         }
                     });
                     //para rechazar
-                } else if (state == estados[2]) {
+                } else if (state == estadosProducto[2]) {
                     await Product.findByIdAndUpdate(id, {
                         state: state,
                         motivo_rechazo: motivo_rechazo
@@ -287,6 +297,7 @@ const actualizarEstado = async (req = request, res = response) => {
                                 supervisor_lastname: lastname
                             }, function (err) {
                                 if (!err) {
+                                    sendEmail(usuario.email, 'Producto ' + producto.name +  ' rechazado', 'Estimado ' + usuario.name + ' su artículo ha sido rechazado por el siguiente motivo: ' + motivo_rechazo)
                                     socket.io.emit('estado_actualizado', {
                                         product: producto_actualizado
                                     });
@@ -299,7 +310,7 @@ const actualizarEstado = async (req = request, res = response) => {
                         }
                     });
                     //para pedir al cliente que subsane
-                } else if (state == estados[3]) {
+                } else if (state == estadosProducto[3]) {
                     await Product.findByIdAndUpdate(id, {
                         state: state,
                         motivo_subsanacion: motivo_subsanacion
@@ -317,6 +328,7 @@ const actualizarEstado = async (req = request, res = response) => {
                                 supervisor_lastname: lastname
                             }, function (err) {
                                 if (!err) {
+                                    sendEmail(usuario.email, 'Producto ' + producto.name +  '  en subsanación', 'Estimado ' + usuario.name + ' su artículo debe ser subsanado por la siguiente razón: ' + motivo_subsanacion + '. Por favor, subsane en el más breve plazo')
                                     socket.io.emit('estado_actualizado', {
                                         product: producto_actualizado
                                     });

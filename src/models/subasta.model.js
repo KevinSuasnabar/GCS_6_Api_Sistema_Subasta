@@ -10,6 +10,16 @@ const SubastaSchema = Schema({
         type: Schema.Types.ObjectId,
         ref: 'Product'
     },
+    vendedor: {
+        required: true,
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    comprador: {
+        required: false,
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
     moneda: {
         type: String,
         required: true
@@ -56,6 +66,18 @@ const SubastaSchema = Schema({
     puja: {
         type: Number,
         default: 0
+    },
+    precio_pagado: {
+        type: Number,
+        required: false
+    },
+    calificacion: {
+        type: Number,
+        required: false
+    },
+    mensaje_calificacion: {
+        type: String,
+        required: false
     }
 
 }, { timestamps: true });

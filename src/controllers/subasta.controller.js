@@ -1,6 +1,7 @@
 const { response, request } = require('express');
 const Subasta = require('../models/subasta.model');
 const Product = require('../models/product.model');
+const estadosSubasta = require('../constantes/estadosSubasta');
 
 const createSubasta = async(req = request, res) => {
     try {
@@ -95,4 +96,44 @@ const getSubastaById = async(req = request, res = response) => {
         })
     }
 }
-module.exports = { createSubasta, getSubastas, getSubastaById };
+
+const getSubastasByIdComprador = async(req = request, res = response) => {
+    const idComprador = req.params.idComprador;
+    try{
+        const subastasHistorialCompra = await Subasta.find({$and : [{comprador : idComprador}, {estado : estadosSubasta[3]}]}).populate('producto').populate('vendedor')
+        if (subastasHistorialCompra) {
+            return res.status(200).json({
+                ok: true,
+                subastas: subastasHistorialCompra
+            })
+        }
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            error
+        })
+    }
+}
+
+const calificarSubasta = async(req = request, res = response) => {
+    const idSubasta =  req.body.idSubasta;
+    const calificacion = req.body.calificacion;
+    const mensajeCalificacion = req.body.mensajeCalificacion;
+    try{
+        await Subasta.findByIdAndUpdate(idSubasta, {calificacion : calificacion, mensaje_calificacion : mensajeCalificacion}, {new : true}, function (err, subasta_actualizada) {
+            if (!err) {
+                return res.status(200).json({
+                    ok: true,
+                    subasta: subasta_actualizada
+                })
+            }
+        });   
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            error
+        })
+    }
+}
+
+module.exports = { createSubasta, getSubastas, getSubastaById, getSubastasByIdComprador, calificarSubasta };

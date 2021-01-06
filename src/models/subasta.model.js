@@ -63,10 +63,6 @@ const SubastaSchema = Schema({
         type: Number,
         required: false
     },
-    puja: {
-        type: Number,
-        default: 0
-    },
     precio_pagado: {
         type: Number,
         required: false
@@ -80,5 +76,5 @@ const SubastaSchema = Schema({
         required: false
     }
 
-}, { timestamps: true });
+});
 module.exports = model('Subasta', SubastaSchema);

@@ -5,6 +5,7 @@ const estadosSubasta = require('../constantes/estadosSubasta');
 
 const createSubasta = async(req = request, res) => {
     try {
+        const vendedor = req._id;
         const tipos = ['INGLESA', 'HOLANDESA'];
         const modos = ['ASYNC', 'SINC'];
         const id_producto = req.params.idProducto;
@@ -36,7 +37,8 @@ const createSubasta = async(req = request, res) => {
         }
         const subasta_aux = new Subasta({
             ...data_subasta,
-            producto: id_producto
+            producto: id_producto,
+            vendedor
         });
         prod.state = 'EN SUBASTA';
         await prod.save();
@@ -99,8 +101,8 @@ const getSubastaById = async(req = request, res = response) => {
 
 const getSubastasByIdComprador = async(req = request, res = response) => {
     const idComprador = req.params.idComprador;
-    try{
-        const subastasHistorialCompra = await Subasta.find({$and : [{comprador : idComprador}, {estado : estadosSubasta[3]}]}).populate('producto').populate('vendedor')
+    try {
+        const subastasHistorialCompra = await Subasta.find({ $and: [{ comprador: idComprador }, { estado: estadosSubasta[3] }] }).populate('producto').populate('vendedor')
         if (subastasHistorialCompra) {
             return res.status(200).json({
                 ok: true,
@@ -116,18 +118,18 @@ const getSubastasByIdComprador = async(req = request, res = response) => {
 }
 
 const calificarSubasta = async(req = request, res = response) => {
-    const idSubasta =  req.body.idSubasta;
+    const idSubasta = req.body.idSubasta;
     const calificacion = req.body.calificacion;
     const mensajeCalificacion = req.body.mensajeCalificacion;
-    try{
-        await Subasta.findByIdAndUpdate(idSubasta, {calificacion : calificacion, mensaje_calificacion : mensajeCalificacion}, {new : true}, function (err, subasta_actualizada) {
+    try {
+        await Subasta.findByIdAndUpdate(idSubasta, { calificacion: calificacion, mensaje_calificacion: mensajeCalificacion }, { new: true }, function(err, subasta_actualizada) {
             if (!err) {
                 return res.status(200).json({
                     ok: true,
                     subasta: subasta_actualizada
                 })
             }
-        });   
+        });
     } catch (error) {
         return res.status(500).json({
             ok: false,

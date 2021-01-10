@@ -40,11 +40,11 @@ const SubastaSchema = Schema({
             //ASYNC:CON TIEMPO - SINC:AL MOMENTO
     },
     hora_inicio: {
-        type: Date,
+        type: String,
         required: false
     },
     hora_fin: {
-        type: Date,
+        type: String,
         required: false
     },
     fecha_inicio: {

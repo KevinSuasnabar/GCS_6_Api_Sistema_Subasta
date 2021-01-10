@@ -48,7 +48,8 @@ const createSubasta = async(req = request, res) => {
         if (subasta) {
             return res.status(200).json({
                 ok: true,
-                message: 'Subasta creada'
+                message: 'Subasta creada',
+                subasta
             })
         } else {
             return res.status(400).json({
@@ -91,7 +92,7 @@ const getSubastaById = async(req = request, res = response) => {
         }
         return res.status(200).json({
             ok: true,
-            data: subasta
+            subasta
         })
     } catch (error) {
         return res.status(500).json({

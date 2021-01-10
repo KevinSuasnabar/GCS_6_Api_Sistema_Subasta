@@ -74,7 +74,16 @@ const SubastaSchema = Schema({
     mensaje_calificacion: {
         type: String,
         required: false
+    },
+    participantes: {
+        type: [Schema.Types.ObjectId],
+        ref: 'User',
+        required: false
+    },
+    pujas: {
+        type: [Schema.Types.ObjectId],
+        ref: 'User',
+        required: false
     }
-
 });
 module.exports = model('Subasta', SubastaSchema);

@@ -82,7 +82,7 @@ const SubastaSchema = Schema({
     },
     pujas: {
         type: [Schema.Types.ObjectId],
-        ref: 'User',
+        ref: 'Puja',
         required: false
     }
 });

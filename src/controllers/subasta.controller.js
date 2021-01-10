@@ -7,10 +7,10 @@ const { findByIdAndUpdate, findById } = require('../models/subasta.model');
 
 const createSubasta = async(req = request, res) => {
     try {
-        const vendedor = req._id;
         const tipos = ['INGLESA', 'HOLANDESA'];
         const modos = ['ASYNC', 'SINC'];
         const id_producto = req.params.idProducto;
+        const id_vendedor = req.params.idVendedor;
         const data_subasta = req.body;
         const prod = await Product.findById(id_producto);
         if (prod.state !== 'APROBADO') {
@@ -40,7 +40,7 @@ const createSubasta = async(req = request, res) => {
         const subasta_aux = new Subasta({
             ...data_subasta,
             producto: id_producto,
-            vendedor
+            vendedor: id_vendedor
         });
         prod.state = 'EN SUBASTA';
         await prod.save();
@@ -51,7 +51,7 @@ const createSubasta = async(req = request, res) => {
                 message: 'Subasta creada'
             })
         } else {
-            return res.status(200).json({
+            return res.status(400).json({
                 ok: false,
                 message: 'Error en salvar subasta.'
             })

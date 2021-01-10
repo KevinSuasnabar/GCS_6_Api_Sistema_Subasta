@@ -14,6 +14,6 @@ router.get('/pujas/:id', [validationJWT], getHistorialPujasBySubasta);
 router.get('/participaciones', [validationJWT], getSubastasByParticipacion);
 router.put('/calificar', [validationJWT], calificarSubasta);
 router.post('/pujar/:id', [validationJWT], pujarSubasta);
-router.post('/:idProducto', [validationJWT], createSubasta);
+router.post('/:idProducto/vendedor/:idVendedor', [validationJWT], createSubasta);
 
 module.exports = router;

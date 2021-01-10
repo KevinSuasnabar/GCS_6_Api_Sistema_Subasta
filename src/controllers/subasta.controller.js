@@ -53,7 +53,7 @@ const createSubasta = async(req = request, res) => {
         } else {
             return res.status(400).json({
                 ok: false,
-                message: 'Error en salvar subasta.'
+                message: 'Error en salvar subasta.' 
             })
         }
     } catch (error) {

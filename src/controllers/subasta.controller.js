@@ -45,10 +45,11 @@ const createSubasta = async(req = request, res) => {
         prod.state = 'EN SUBASTA';
         await prod.save();
         const subasta = await subasta_aux.save();
+
         if (subasta) {
             return res.status(200).json({
                 ok: true,
-                message: 'Subasta creada',
+                message: 'Subasta creada y en proceso',
                 subasta
             })
         } else {
@@ -83,7 +84,7 @@ const getSubastas = async(req = request, res = response) => {
 const getSubastaById = async(req = request, res = response) => {
     try {
         const id = req.params.id;
-        const subasta = await Subasta.findById(id).populate('producto');
+        const subasta = await Subasta.findById(id).populate('producto').populate('vendedor');
         if (!subasta) {
             return res.status(404).json({
                 ok: false,
@@ -245,4 +246,29 @@ const calificarSubasta = async(req = request, res = response) => {
     }
 }
 
-module.exports = { createSubasta, getSubastas, getSubastaById, getSubastasByIdComprador, calificarSubasta, getHistorialPujasBySubasta, pujarSubasta, getSubastasByParticipacion };
+const finalizarSubasta = async(req = request, res = response) => {
+    try {
+        const idSubasta = req.params.idSubasta;
+        const precioPagado = req.body.precioPagado
+        const idComprador = req.body.idComprador
+
+        await Subasta.findByIdAndUpdate(idSubasta, { precio_pagado: precioPagado, comprador: idComprador }, { new: true }, function(err, subasta_actualizada) {
+            if (!err) {
+                return res.status(200).json({
+                    ok: true,
+                    subasta: subasta_actualizada
+                })
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            error
+        })
+    }
+}
+
+
+
+
+module.exports = { createSubasta, getSubastas, getSubastaById, getSubastasByIdComprador, calificarSubasta, getHistorialPujasBySubasta, pujarSubasta, getSubastasByParticipacion, finalizarSubasta };

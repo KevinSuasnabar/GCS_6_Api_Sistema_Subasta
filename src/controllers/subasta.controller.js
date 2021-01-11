@@ -1,11 +1,17 @@
-const { response, request } = require('express');
+const {
+    response,
+    request
+} = require('express');
 const Subasta = require('../models/subasta.model');
 const Puja = require('../models/puja.model');
 const Product = require('../models/product.model');
 const estadosSubasta = require('../constantes/estadosSubasta');
-const { findByIdAndUpdate, findById } = require('../models/subasta.model');
+const {
+    findByIdAndUpdate,
+    findById
+} = require('../models/subasta.model');
 
-const createSubasta = async(req = request, res) => {
+const createSubasta = async (req = request, res) => {
     try {
         const tipos = ['INGLESA', 'HOLANDESA'];
         const modos = ['ASYNC', 'SINC'];
@@ -55,7 +61,7 @@ const createSubasta = async(req = request, res) => {
         } else {
             return res.status(400).json({
                 ok: false,
-                message: 'Error en salvar subasta.' 
+                message: 'Error en salvar subasta.'
             })
         }
     } catch (error) {
@@ -66,7 +72,7 @@ const createSubasta = async(req = request, res) => {
     }
 }
 
-const getSubastas = async(req = request, res = response) => {
+const getSubastas = async (req = request, res = response) => {
     try {
         const subastas = await Subasta.find().populate('producto');
         return res.status(200).json({
@@ -81,7 +87,7 @@ const getSubastas = async(req = request, res = response) => {
     }
 }
 
-const getSubastaById = async(req = request, res = response) => {
+const getSubastaById = async (req = request, res = response) => {
     try {
         const id = req.params.id;
         const subasta = await Subasta.findById(id).populate('producto').populate('vendedor');
@@ -103,24 +109,32 @@ const getSubastaById = async(req = request, res = response) => {
     }
 }
 
-const pujarSubasta = async(req = request, res = response) => {
+const pujarSubasta = async (req = request, res = response) => {
     try {
         const user = req._id;
         const idSubasta = req.params.subasta;
-        const { monto, hora, dia } = req.body;
+        const {
+            monto,
+            hora,
+            dia
+        } = req.body;
         const puja = {
-                monto,
-                hora,
-                dia,
-                comprador: user
-            } //Captura data
+            monto,
+            hora,
+            dia,
+            comprador: user
+        } //Captura data
         const puja_aux = new Puja(puja);
         const pujaSaved = await puja_aux.save(); //Guarda la puja
         const subasta = Subasta.findById(idSubasta); //Busca si existe una subasta
         if (pujaSaved && subasta) {
             let pujas = subasta.pujas; //Captura las pujas
             pujas.push(pujaSaved); //Redimencionamos
-            const subastaNew = await findByIdAndUpdate(idSubasta, { pujas }, { new: true }); //Actualizamos las pujas
+            const subastaNew = await findByIdAndUpdate(idSubasta, {
+                pujas
+            }, {
+                new: true
+            }); //Actualizamos las pujas
             if (!(subastaNew)) {
                 return res.status(404).json({
                     ok: false,
@@ -130,7 +144,11 @@ const pujarSubasta = async(req = request, res = response) => {
             let participantes = subasta.participantes; //Capturamos a los participantes
             if (!participantes.includes(user)) { //Verificamos si ya participa
                 participantes.push(user); //Redimencionamos
-                const participantesNew = await findByIdAndUpdate(idSubasta, { participantes }, { new: true }); //Actualizamos a los participantes
+                const participantesNew = await findByIdAndUpdate(idSubasta, {
+                    participantes
+                }, {
+                    new: true
+                }); //Actualizamos a los participantes
                 if (!(participantesNew)) {
                     return res.status(404).json({
                         ok: false,
@@ -157,7 +175,7 @@ const pujarSubasta = async(req = request, res = response) => {
     }
 }
 
-const getHistorialPujasBySubasta = async(req = request, res = response) => {
+const getHistorialPujasBySubasta = async (req = request, res = response) => {
     try {
         const idSubasta = req.params.id;
         const subasta = await Subasta.findById(idSubasta);
@@ -179,7 +197,7 @@ const getHistorialPujasBySubasta = async(req = request, res = response) => {
     }
 }
 
-const getSubastasByParticipacion = async(req = request, res = response) => {
+const getSubastasByParticipacion = async (req = request, res = response) => {
     try {
         const user = req._id;
         const subastas = await Subasta.find();
@@ -207,10 +225,16 @@ const getSubastasByParticipacion = async(req = request, res = response) => {
     }
 }
 
-const getSubastasByIdComprador = async(req = request, res = response) => {
+const getSubastasByIdComprador = async (req = request, res = response) => {
     const idComprador = req.params.idComprador;
     try {
-        const subastasHistorialCompra = await Subasta.find({ $and: [{ comprador: idComprador }, { estado: estadosSubasta[3] }] }).populate('producto').populate('vendedor')
+        const subastasHistorialCompra = await Subasta.find({
+            $and: [{
+                comprador: idComprador
+            }, {
+                estado: estadosSubasta[3]
+            }]
+        }).populate('producto').populate('vendedor')
         if (subastasHistorialCompra) {
             return res.status(200).json({
                 ok: true,
@@ -225,12 +249,17 @@ const getSubastasByIdComprador = async(req = request, res = response) => {
     }
 }
 
-const calificarSubasta = async(req = request, res = response) => {
+const calificarSubasta = async (req = request, res = response) => {
     const idSubasta = req.body.idSubasta;
     const calificacion = req.body.calificacion;
     const mensajeCalificacion = req.body.mensajeCalificacion;
     try {
-        await Subasta.findByIdAndUpdate(idSubasta, { calificacion: calificacion, mensaje_calificacion: mensajeCalificacion }, { new: true }, function(err, subasta_actualizada) {
+        await Subasta.findByIdAndUpdate(idSubasta, {
+            calificacion: calificacion,
+            mensaje_calificacion: mensajeCalificacion
+        }, {
+            new: true
+        }, function (err, subasta_actualizada) {
             if (!err) {
                 return res.status(200).json({
                     ok: true,
@@ -246,13 +275,18 @@ const calificarSubasta = async(req = request, res = response) => {
     }
 }
 
-const finalizarSubasta = async(req = request, res = response) => {
+const finalizarSubasta = async (req = request, res = response) => {
     try {
         const idSubasta = req.params.idSubasta;
         const precioPagado = req.body.precioPagado
         const idComprador = req.body.idComprador
 
-        await Subasta.findByIdAndUpdate(idSubasta, { precio_pagado: precioPagado, comprador: idComprador }, { new: true }, function(err, subasta_actualizada) {
+        await Subasta.findByIdAndUpdate(idSubasta, {
+            precio_pagado: precioPagado,
+            comprador: idComprador
+        }, {
+            new: true
+        }, function (err, subasta_actualizada) {
             if (!err) {
                 return res.status(200).json({
                     ok: true,
@@ -268,7 +302,48 @@ const finalizarSubasta = async(req = request, res = response) => {
     }
 }
 
+const subastaPorCategoria = async (req = request, res) => {
+    try {
+        const category = req.params.categoryName;
+        const subastas = await Subasta.find({}).populate('producto');
+
+        var listSubasta = [];
+        subastas.map(sub => {
+            if(sub.producto.category == category){
+                listSubasta.push(sub);
+            }
+        });
+        // await Promise.all(subastas.map(async (sub) => {
+        //     const idProducto = sub.producto;
+        //     const subastasFiltradas = await Product.findById({
+        //         _id: idProducto
+        //     });
+        //     subastasList.push(subastasFiltradas);
+        // }));
+        return res.status(200).json({
+            ok: true,
+            results: listSubasta
+        })
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            error
+        })
+    }
+}
 
 
 
-module.exports = { createSubasta, getSubastas, getSubastaById, getSubastasByIdComprador, calificarSubasta, getHistorialPujasBySubasta, pujarSubasta, getSubastasByParticipacion, finalizarSubasta };
+
+module.exports = {
+    createSubasta,
+    getSubastas,
+    getSubastaById,
+    getSubastasByIdComprador,
+    calificarSubasta,
+    getHistorialPujasBySubasta,
+    pujarSubasta,
+    getSubastasByParticipacion,
+    finalizarSubasta,
+    subastaPorCategoria
+};

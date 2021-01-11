@@ -11,5 +11,5 @@ router.get('/listar', [validationJWT], listar);
 router.put('/eliminar', [validationJWT], eliminar);
 router.get('/cantidad', [validationJWT], cantidadClientes);
 router.get('/obtenerCalificacionVendedor', obtenerCalificacionVendedor);
-
+ 
 module.exports = router; 

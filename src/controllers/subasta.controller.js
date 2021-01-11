@@ -7,7 +7,9 @@ const User = require('../models/user.model');
 const Puja = require('../models/puja.model');
 const Product = require('../models/product.model');
 const estadosSubasta = require('../constantes/estadosSubasta');
+const estadosProducto = require('../constantes/estadosProducto');
 const socket = require('../app');
+const { sendEmail } = require('../helpers/email.helper');
 
 
 const createSubasta = async(req = request, res) => {
@@ -52,9 +54,6 @@ const createSubasta = async(req = request, res) => {
         const subasta = await subasta_aux.save();
 
         if (subasta) {
-            // socket.io.emit('12345', {
-            //     saludo: 'Holaaa'
-            // });
             return res.status(200).json({
                 ok: true,
                 message: 'Subasta creada y en proceso',
@@ -115,7 +114,6 @@ const pujarSubasta = async(req = request, res = response) => {
     try {
         const user = req._id;
         const idSubasta = req.params.id;
-        console.log(idSubasta);
         const { monto, hora, dia } = req.body;
         const puja = {
                 monto,
@@ -123,6 +121,9 @@ const pujarSubasta = async(req = request, res = response) => {
                 dia,
                 comprador: user
             } //Captura data
+            console.log(user);
+            console.log(idSubasta);
+            console.log(puja);
         const puja_aux = new Puja(puja);
         const pujaSaved = await puja_aux.save(); //Guarda la puja
         const subasta = await Subasta.findById(idSubasta); //Busca si existe una subasta
@@ -151,8 +152,9 @@ const pujarSubasta = async(req = request, res = response) => {
                 }
             }
             const subastaFinal = await Subasta.findById(idSubasta);
+            console.log(subastaFinal)
             const userWin = await User.findById(user);
-            socket.io.emit(subastaFinal._id, { data: puja, user: userWin })
+            socket.io.emit(subastaFinal._id, { data: puja, user: userWin, mensaje: 'proceso' })
             return res.status(200).json({
                 ok: true,
                 data: subastaFinal
@@ -206,7 +208,7 @@ const getSubastasByParticipacion = async(req = request, res = response) => {
                     flag = true;
                 }
             })
-            if (flag) {
+            if (flag && (sub.estado === "EN PROCESO")) {
                 subastas_aux.push(sub);
             }
         })
@@ -280,11 +282,23 @@ const finalizarSubasta = async(req = request, res = response) => {
 
         await Subasta.findByIdAndUpdate(idSubasta, {
             precio_pagado: precioPagado,
-            comprador: idComprador
+            comprador: idComprador,
+            estado: estadosSubasta[3]
         }, {
             new: true
         }, function(err, subasta_actualizada) {
             if (!err) {
+                Product.findByIdAndUpdate(subasta_actualizada.producto, {state: estadosProducto[6]}, {new : true}, function(err, producto_actualizado){
+                    console.log(subasta_actualizada.comprador)
+                    User.findById(subasta_actualizada.comprador, function(err, usuario_encontrado){
+
+                        sendEmail(usuario_encontrado.email, 'Producto ' + producto_actualizado.name +  ' comprado en subasta ' + subasta_actualizada.titulo, 'Estimado ' + usuario_encontrado.name + ' usted ha comprado el producto ' + producto_actualizado.name +  ' en la subasta ' + subasta_actualizada.titulo + ' pagando ' + subasta_actualizada.precio_pagado + ' por favor, proceda a calificar al vendedor');
+                        socket.io.emit(subasta_actualizada._id, {name : usuario_encontrado.name, precio : subasta_actualizada.precio_pagado, mensaje: 'final'})
+                    });
+
+                    
+                });
+
                 return res.status(200).json({
                     ok: true,
                     subasta: subasta_actualizada
@@ -302,7 +316,7 @@ const finalizarSubasta = async(req = request, res = response) => {
 const subastaPorCategoria = async(req = request, res) => {
     try {
         const category = req.params.categoryName;
-        const subastas = await Subasta.find({}).populate('producto');
+        const subastas = await Subasta.find({estado: estadosSubasta[1]}).populate('producto');
 
         var listSubasta = [];
         subastas.map(sub => {

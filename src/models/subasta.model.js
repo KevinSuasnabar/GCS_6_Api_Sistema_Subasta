@@ -26,7 +26,7 @@ const SubastaSchema = Schema({
     },
     estado: {
         type: String,
-        default: 'CREADO'
+        default: 'EN PROCESO'
             //CREADO - EN PROCESO - FINALIZADO - SUSPENDIDO
     },
     tipo: {

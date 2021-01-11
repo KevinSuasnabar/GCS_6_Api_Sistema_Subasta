@@ -75,7 +75,7 @@ const cantidadClientes = async(req = request, res = response) => {
 const obtenerCalificacionVendedor = async(req = request, res = response) => {
     try {
         let calificacion = 0;
-        let i = 1;
+        let i = 0;
         const idVendedor = req._id;
         const subastas = await Subasta.find({ $and: [{ vendedor: idVendedor }, { estado: estadosSubasta[3] }] });
         subastas.forEach(sub => {

@@ -1,4 +1,6 @@
 const { response, request } = require('express');
+const Subasta = require('../models/subasta.model');
+const estadosSubasta = require('../constantes/estadosSubasta');
 const User = require('../models/user.model');
 
 const listar = async(req = request, res = response) => {
@@ -70,4 +72,28 @@ const cantidadClientes = async(req = request, res = response) => {
     }
 }
 
-module.exports = { listar, eliminar, cantidadClientes };
+const obtenerCalificacionVendedor = async(req = request, res = response) => {
+    try {
+        let calificacion = 0;
+        let i = 0;
+        const idVendedor = req._id;
+        const subastas = await Subasta.find({ $and: [{ vendedor: idVendedor }, { estado: estadosSubasta[3] }] });
+        subastas.forEach(sub => {
+            calificacion = sub.calificacion + calificacion;
+            i++;
+        });
+        const promedio = Math.round(calificacion/i);
+        return res.status(200).json({
+            ok: true,
+            promedio
+        })
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            error
+        })
+    }
+}
+
+
+module.exports = { listar, eliminar, cantidadClientes, obtenerCalificacionVendedor };

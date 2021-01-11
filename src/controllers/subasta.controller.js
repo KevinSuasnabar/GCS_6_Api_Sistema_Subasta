@@ -1,9 +1,12 @@
 const { response, request } = require('express');
 const Subasta = require('../models/subasta.model');
+const User = require('../models/user.model');
 const Puja = require('../models/puja.model');
 const Product = require('../models/product.model');
 const estadosSubasta = require('../constantes/estadosSubasta');
 const { findByIdAndUpdate, findById } = require('../models/subasta.model');
+const socket = require('../app');
+
 
 const createSubasta = async(req = request, res) => {
     try {
@@ -47,6 +50,9 @@ const createSubasta = async(req = request, res) => {
         const subasta = await subasta_aux.save();
 
         if (subasta) {
+            // socket.io.emit('12345', {
+            //     saludo: 'Holaaa'
+            // });
             return res.status(200).json({
                 ok: true,
                 message: 'Subasta creada y en proceso',
@@ -55,7 +61,7 @@ const createSubasta = async(req = request, res) => {
         } else {
             return res.status(400).json({
                 ok: false,
-                message: 'Error en salvar subasta.' 
+                message: 'Error en salvar subasta.'
             })
         }
     } catch (error) {
@@ -106,7 +112,8 @@ const getSubastaById = async(req = request, res = response) => {
 const pujarSubasta = async(req = request, res = response) => {
     try {
         const user = req._id;
-        const idSubasta = req.params.subasta;
+        const idSubasta = req.params.id;
+        console.log(idSubasta);
         const { monto, hora, dia } = req.body;
         const puja = {
                 monto,
@@ -116,21 +123,24 @@ const pujarSubasta = async(req = request, res = response) => {
             } //Captura data
         const puja_aux = new Puja(puja);
         const pujaSaved = await puja_aux.save(); //Guarda la puja
-        const subasta = Subasta.findById(idSubasta); //Busca si existe una subasta
+        const subasta = await Subasta.findById(idSubasta); //Busca si existe una subasta
         if (pujaSaved && subasta) {
-            let pujas = subasta.pujas; //Captura las pujas
+            let pujas = subasta.pujas || []; //Captura las pujas
+            console.log(pujas);
             pujas.push(pujaSaved); //Redimencionamos
-            const subastaNew = await findByIdAndUpdate(idSubasta, { pujas }, { new: true }); //Actualizamos las pujas
+            console.log(pujas);
+            const subastaNew = await Subasta.findByIdAndUpdate(idSubasta, { pujas }, { new: true }); //Actualizamos las pujas
             if (!(subastaNew)) {
                 return res.status(404).json({
                     ok: false,
                     message: 'Error al actualizar pujas.'
                 })
             }
-            let participantes = subasta.participantes; //Capturamos a los participantes
+            let participantes = subasta.participantes || []; //Capturamos a los participantes
+            console.log(participantes);
             if (!participantes.includes(user)) { //Verificamos si ya participa
                 participantes.push(user); //Redimencionamos
-                const participantesNew = await findByIdAndUpdate(idSubasta, { participantes }, { new: true }); //Actualizamos a los participantes
+                const participantesNew = await Subasta.findByIdAndUpdate(idSubasta, { participantes }, { new: true }); //Actualizamos a los participantes
                 if (!(participantesNew)) {
                     return res.status(404).json({
                         ok: false,
@@ -138,7 +148,9 @@ const pujarSubasta = async(req = request, res = response) => {
                     })
                 }
             }
-            const subastaFinal = await findById(idSubasta);
+            const subastaFinal = await Subasta.findById(idSubasta);
+            const userWin = await User.findById(user);
+            socket.io.emit(subastaFinal._id, { data: puja, user: userWin })
             return res.status(200).json({
                 ok: true,
                 data: subastaFinal
@@ -154,6 +166,7 @@ const pujarSubasta = async(req = request, res = response) => {
             ok: false,
             error
         })
+
     }
 }
 

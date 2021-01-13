@@ -18,7 +18,7 @@ router.put('/calificar', [validationJWT], calificarSubasta);
 router.post('/pujar/:id', [validationJWT], pujarSubasta);
 router.post('/:idProducto/vendedor/:idVendedor', [validationJWT], createSubasta);
 router.put('/finalizar/:idSubasta', [validationJWT], finalizarSubasta);
-router.get('/category/:categoryName', [validationJWT], subastaPorCategoria)
+router.get('/category/:categoryName',  subastaPorCategoria)
 router.get('/filtrarSubastasByProductoAndVendedor/:filter', [validationJWT], filtrarSubastasByProductoAndVendedor)
 router.get('/getPujasBySubasta/:idSubasta', [validationJWT], getPujasBySubasta);
 

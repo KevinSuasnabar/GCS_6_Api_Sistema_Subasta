@@ -148,13 +148,24 @@ const pujarSubasta = async(req = request, res = response) => {
             const subastaFinal = await Subasta.findById(idSubasta);
             const userWin = await User.findById(user);
 
+            var precioBase = subastaFinal.precio_base;
+            const tipoSubasta = subastaFinal.tipo;
+            var precioTemporal = 0;
             var pujasArray = [];
+
             for (const puj of subasta.pujas){
                 const pujas = await Puja.findById(puj).populate('comprador', 'name');
                 pujasArray.push(pujas)
             }
 
-            socket.io.emit(subastaFinal._id, { data: puja, user: userWin, pujas: pujasArray, mensaje: 'proceso' })
+            if(tipoSubasta == 'INGLESA'){
+                for (const p of pujasArray){
+                    precioTemporal = p.monto + precioBase;
+                    precioBase =  precioTemporal;
+                }
+            }
+
+            socket.io.emit(subastaFinal._id, { puja: puja, user: userWin, pujas: pujasArray, mensaje: 'proceso', tipo: subastaFinal.tipo, precioTemp: precioTemporal })
             return res.status(200).json({
                 ok: true,
                 data: subastaFinal
@@ -289,11 +300,10 @@ const finalizarSubasta = async(req = request, res = response) => {
         }, function(err, subasta_actualizada) {
             if (!err) {
                 Product.findByIdAndUpdate(subasta_actualizada.producto, {state: estadosProducto[6]}, {new : true}, function(err, producto_actualizado){
-                    console.log(subasta_actualizada.comprador)
                     User.findById(subasta_actualizada.comprador, function(err, usuario_encontrado){
 
-                        sendEmail(usuario_encontrado.email, 'Producto ' + producto_actualizado.name +  ' comprado en subasta ' + subasta_actualizada.titulo, 'Estimado ' + usuario_encontrado.name + ' usted ha comprado el producto ' + producto_actualizado.name +  ' en la subasta ' + subasta_actualizada.titulo + ' pagando ' + subasta_actualizada.precio_pagado + ' por favor, proceda a calificar al vendedor');
-                        socket.io.emit(subasta_actualizada._id, {name : usuario_encontrado.name, precio : subasta_actualizada.precio_pagado, mensaje: 'final'})
+                        sendEmail(usuario_encontrado.email, 'Producto ' + producto_actualizado.name +  ' comprado en subasta ' + subasta_actualizada.titulo, 'Estimado ' + usuario_encontrado.name + ' usted ha comprado el producto ' + producto_actualizado.name +  ' en la subasta ' + subasta_actualizada.titulo + ' pagando ' + subasta_actualizada.precio_pagado + ' por favor, proceda a calificar al vendedor una vez tenga su producto.');
+                        socket.io.emit(subasta_actualizada._id, {name: usuario_encontrado.name, precio: subasta_actualizada.precio_pagado, mensaje: 'final'})
                     });   
                 });
                 return res.status(200).json({
@@ -373,11 +383,20 @@ const getPujasBySubasta = async(req = request, res = response) => {
     try {
         const idSubasta = req.params.idSubasta;
         const subasta = await Subasta.findById(idSubasta);
+        var precioBase = subasta.precio_base;
+        const tipoSubasta = subasta.tipo;
+        var precioTemporal = 0;
         var pujasArray = [];
 
         for (const puj of subasta.pujas){
             const pujas = await Puja.findById(puj).populate('comprador', 'name');
             pujasArray.push(pujas)
+        }
+        if(tipoSubasta == 'INGLESA'){
+            for (const p of pujasArray){
+                precioTemporal = p.monto + precioBase;
+                precioBase =  precioTemporal;
+            }
         }
         if (!subasta) { 
             return res.status(404).json({
@@ -387,7 +406,8 @@ const getPujasBySubasta = async(req = request, res = response) => {
         }
         return res.status(200).json({
             ok: true,
-            pujas: pujasArray
+            pujas: pujasArray,
+            precioTemp : precioTemporal
         })
     } catch (error) {
         return res.status(500).json({

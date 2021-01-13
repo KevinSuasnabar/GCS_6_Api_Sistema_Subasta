@@ -74,15 +74,25 @@ const cantidadClientes = async(req = request, res = response) => {
 
 const obtenerCalificacionVendedor = async(req = request, res = response) => {
     try {
+        const idSubasta = req.params.idSubasta;
+
         let calificacion = 0;
         let i = 0;
-        const idVendedor = req._id;
-        const subastas = await Subasta.find({ $and: [{ vendedor: idVendedor }, { estado: estadosSubasta[3] }] });
-        subastas.forEach(sub => {
-            calificacion = sub.calificacion + calificacion;
-            i++;
-        });
-        const promedio = Math.round(calificacion/i);
+        var promedio;
+
+        const subasta =  await Subasta.findOne({_id : idSubasta})
+
+        if(subasta){
+            const idVendedor = subasta.vendedor;
+            const subastas = await Subasta.find({ $and: [{ vendedor: idVendedor }, { estado: estadosSubasta[3] }] });
+            subastas.forEach(sub => {
+                calificacion = sub.calificacion + calificacion;
+                i++;
+            });
+            promedio = Math.round(calificacion/i);
+        }else{
+            promedio = 0;
+        }
         return res.status(200).json({
             ok: true,
             promedio

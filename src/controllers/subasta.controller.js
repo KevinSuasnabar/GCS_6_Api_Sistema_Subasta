@@ -121,17 +121,12 @@ const pujarSubasta = async(req = request, res = response) => {
                 dia,
                 comprador: user
             } //Captura data
-            console.log(user);
-            console.log(idSubasta);
-            console.log(puja);
         const puja_aux = new Puja(puja);
         const pujaSaved = await puja_aux.save(); //Guarda la puja
         const subasta = await Subasta.findById(idSubasta); //Busca si existe una subasta
         if (pujaSaved && subasta) {
             let pujas = subasta.pujas || []; //Captura las pujas
-            console.log(pujas);
             pujas.push(pujaSaved); //Redimencionamos
-            console.log(pujas);
             const subastaNew = await Subasta.findByIdAndUpdate(idSubasta, { pujas }, { new: true }); //Actualizamos las pujas
             if (!(subastaNew)) {
                 return res.status(404).json({
@@ -140,7 +135,6 @@ const pujarSubasta = async(req = request, res = response) => {
                 })
             }
             let participantes = subasta.participantes || []; //Capturamos a los participantes
-            console.log(participantes);
             if (!participantes.includes(user)) { //Verificamos si ya participa
                 participantes.push(user); //Redimencionamos
                 const participantesNew = await Subasta.findByIdAndUpdate(idSubasta, { participantes }, { new: true }); //Actualizamos a los participantes
@@ -152,9 +146,26 @@ const pujarSubasta = async(req = request, res = response) => {
                 }
             }
             const subastaFinal = await Subasta.findById(idSubasta);
-            console.log(subastaFinal)
             const userWin = await User.findById(user);
-            socket.io.emit(subastaFinal._id, { data: puja, user: userWin, mensaje: 'proceso' })
+
+            var precioBase = subastaFinal.precio_base;
+            const tipoSubasta = subastaFinal.tipo;
+            var precioTemporal = 0;
+            var pujasArray = [];
+
+            for (const puj of subasta.pujas){
+                const pujas = await Puja.findById(puj).populate('comprador', 'name');
+                pujasArray.push(pujas)
+            }
+
+            if(tipoSubasta == 'INGLESA'){
+                for (const p of pujasArray){
+                    precioTemporal = p.monto + precioBase;
+                    precioBase =  precioTemporal;
+                }
+            }
+
+            socket.io.emit(subastaFinal._id, { puja: puja, user: userWin, pujas: pujasArray, mensaje: 'proceso', tipo: subastaFinal.tipo, precioTemp: precioTemporal })
             return res.status(200).json({
                 ok: true,
                 data: subastaFinal
@@ -289,16 +300,12 @@ const finalizarSubasta = async(req = request, res = response) => {
         }, function(err, subasta_actualizada) {
             if (!err) {
                 Product.findByIdAndUpdate(subasta_actualizada.producto, {state: estadosProducto[6]}, {new : true}, function(err, producto_actualizado){
-                    console.log(subasta_actualizada.comprador)
                     User.findById(subasta_actualizada.comprador, function(err, usuario_encontrado){
 
-                        sendEmail(usuario_encontrado.email, 'Producto ' + producto_actualizado.name +  ' comprado en subasta ' + subasta_actualizada.titulo, 'Estimado ' + usuario_encontrado.name + ' usted ha comprado el producto ' + producto_actualizado.name +  ' en la subasta ' + subasta_actualizada.titulo + ' pagando ' + subasta_actualizada.precio_pagado + ' por favor, proceda a calificar al vendedor');
-                        socket.io.emit(subasta_actualizada._id, {name : usuario_encontrado.name, precio : subasta_actualizada.precio_pagado, mensaje: 'final'})
-                    });
-
-                    
+                        sendEmail(usuario_encontrado.email, 'Producto ' + producto_actualizado.name +  ' comprado en subasta ' + subasta_actualizada.titulo, 'Estimado ' + usuario_encontrado.name + ' usted ha comprado el producto ' + producto_actualizado.name +  ' en la subasta ' + subasta_actualizada.titulo + ' pagando ' + subasta_actualizada.precio_pagado + ' por favor, proceda a calificar al vendedor una vez tenga su producto.');
+                        socket.io.emit(subasta_actualizada._id, {name: usuario_encontrado.name, precio: subasta_actualizada.precio_pagado, mensaje: 'final'})
+                    });   
                 });
-
                 return res.status(200).json({
                     ok: true,
                     subasta: subasta_actualizada
@@ -343,8 +350,72 @@ const subastaPorCategoria = async(req = request, res) => {
     }
 }
 
+const filtrarSubastasByProductoAndVendedor = async (req = request, res) => {
+    const id = req._id;
+    const filter = req.params.filter;
+    var subastas_prod_ven;
+    var subastasFiltradas = [];
+    try {
+        if (filter == 'all') {
+            subastas_prod_ven = await Subasta.find({$and: [{ comprador: id }, {estado: estadosSubasta[3]}]}).populate('producto').populate('vendedor')
+            subastasFiltradas = subastas_prod_ven;
+        } else {
+            subastas_prod_ven =  await Subasta.find().populate('producto').populate('vendedor')
+            subastas_prod_ven.forEach(sub => {
+                if ((sub.comprador == id && sub.estado == estadosSubasta[3]) && ((sub['producto'].name == filter) || (sub['vendedor'].name == filter) || (sub['vendedor'].lastname == filter) || (sub['vendedor'].dni == filter) || (sub['vendedor'].email == filter))){
+                    subastasFiltradas.push(sub);
+                }
+            })
+        }
+        return res.status(200).json({
+            ok: true,
+            subastas: subastasFiltradas
+        })
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            error
+        })
+    }
+}
 
+const getPujasBySubasta = async(req = request, res = response) => {
+    try {
+        const idSubasta = req.params.idSubasta;
+        const subasta = await Subasta.findById(idSubasta);
+        var precioBase = subasta.precio_base;
+        const tipoSubasta = subasta.tipo;
+        var precioTemporal = 0;
+        var pujasArray = [];
 
+        for (const puj of subasta.pujas){
+            const pujas = await Puja.findById(puj).populate('comprador', 'name');
+            pujasArray.push(pujas)
+        }
+        if(tipoSubasta == 'INGLESA'){
+            for (const p of pujasArray){
+                precioTemporal = p.monto + precioBase;
+                precioBase =  precioTemporal;
+            }
+        }
+        if (!subasta) { 
+            return res.status(404).json({
+                ok: false,
+                message: 'Subasta no encontrada'
+            })
+        }
+        return res.status(200).json({
+            ok: true,
+            pujas: pujasArray,
+            precioTemp : precioTemporal
+        })
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            error
+        })
+    }
+}
 
 module.exports = {
     createSubasta,
@@ -356,5 +427,7 @@ module.exports = {
     pujarSubasta,
     getSubastasByParticipacion,
     finalizarSubasta,
-    subastaPorCategoria
+    subastaPorCategoria,
+    filtrarSubastasByProductoAndVendedor,
+    getPujasBySubasta
 };

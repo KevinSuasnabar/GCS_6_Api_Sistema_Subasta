@@ -10,6 +10,6 @@ const router = Router();
 router.get('/listar', [validationJWT], listar);
 router.put('/eliminar', [validationJWT], eliminar);
 router.get('/cantidad', [validationJWT], cantidadClientes);
-router.get('/obtenerCalificacionVendedor', [validationJWT], obtenerCalificacionVendedor);
+router.get('/obtenerCalificacionVendedor/:idSubasta', obtenerCalificacionVendedor);
  
 module.exports = router; 

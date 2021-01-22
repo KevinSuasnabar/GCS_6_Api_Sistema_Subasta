@@ -108,9 +108,51 @@ const getProductosSubastados = async(req = request, res) => {
     }
 }
 
+const getMontoTotal = async(req = request, res) => {
+    try {
+        const subastas = await Subasta.find({ estado: 'FINALIZADO' });
+        return res.status(200).json({
+            ok: true,
+            data: subastas
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            error
+        })
+    }
+}
+
+const getSubastasByParticipacion = async(req = request, res) => {
+    try {
+        const id = req._id;
+        const subastas = await Subasta.find().populate('comprador').populate('vendedor').populate('producto');
+        let participacion = [];
+        subastas.forEach(sub => {
+            if (sub.participantes.includes(id)) {
+                participacion.push(sub)
+            }
+        })
+        return res.status(200).json({
+            ok: true,
+            data: participacion
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            error: error
+        })
+    }
+}
+
 module.exports = {
     getProductsSubastadosByCategory,
     getTotalProductsByCategory,
     getCompradores,
-    getProductosSubastados
+    getProductosSubastados,
+    getMontoTotal,
+    getSubastasByParticipacion
 };

@@ -3,12 +3,14 @@
 */
 
 const { Router } = require('express');
-const { getProductsSubastadosByCategory, getTotalProductsByCategory } = require('../controllers/reportes.controller');
+const { getProductsSubastadosByCategory, getTotalProductsByCategory, getCompradores, getProductosSubastados } = require('../controllers/reportes.controller');
 const { validationJWT } = require('../middlewares/validation-jwt.middleware');
 const router = Router();
 
 router.get('/productsByCategory/:dateA/:dateB', [validationJWT], getProductsSubastadosByCategory);
+router.get('/compradores', [validationJWT], getCompradores);
 router.get('/totalProductsByCategory', [validationJWT], getTotalProductsByCategory);
+router.get('/productosSubastados', [validationJWT], getProductosSubastados);
 // router.get('/', [validationJWT], getSubastas);
 // router.get('/getSubastasByIdComprador/:idComprador', [validationJWT], getSubastasByIdComprador);
 // router.get('/pujas/:id', [validationJWT], getHistorialPujasBySubasta);

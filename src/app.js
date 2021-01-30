@@ -22,6 +22,7 @@ app.use('/api/cliente', require('./routes/cliente.route'));
 app.use('/api/admin', require('./routes/admin.route'));
 app.use('/api/ubigeo', require('./routes/ubigeo.route'));
 app.use('/api/subasta', require('./routes/subasta.route'));
+app.use('/api/reportes', require('./routes/reporte.route'));
 
 const { sendEmail } = require('./helpers/email.helper');
 

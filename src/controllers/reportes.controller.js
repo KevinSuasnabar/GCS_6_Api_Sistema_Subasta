@@ -94,7 +94,7 @@ const getCompradores = async(req = request, res) => {
 const getProductosSubastados = async(req = request, res) => {
     try {
         const id = req._id;
-        const subastas = await Subasta.find({ vendedor: id, estado: 'FINALIZADO' }).select('fecha_fin precio_pagado').populate('producto');
+        const subastas = await Subasta.find({ vendedor: id}).populate('producto');
         return res.status(200).json({
             ok: true,
             data: subastas

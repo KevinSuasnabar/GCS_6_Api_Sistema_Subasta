@@ -105,5 +105,24 @@ const obtenerCalificacionVendedor = async(req = request, res = response) => {
     }
 }
 
+const listarInhabilitados = async(req = request, res = response) => {
+    try {
+        await User.find({ $and: [{ role: "CLIENT_ROLE" }, { state: false }] }, function(err, cliente) {
+            if (!err) {
+                return res.status(200).json({
+                    ok: true,
+                    user: cliente
+                })
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            message: 'Error al obtener datos.'
+        })
+    }
+}
 
-module.exports = { listar, eliminar, cantidadClientes, obtenerCalificacionVendedor };
+
+module.exports = { listar, eliminar, cantidadClientes, obtenerCalificacionVendedor, listarInhabilitados };

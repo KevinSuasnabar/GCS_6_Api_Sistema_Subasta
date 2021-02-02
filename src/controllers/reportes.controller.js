@@ -21,7 +21,7 @@ const getProductsSubastadosByCategory = async(req = request, res) => {
         const dateB = new Date(req.params.dateB);
         const id = req._id;
         const supervisor = await User.findById(id);
-        const subastas = await Subasta.find({ estado: 'FINALIZADO' }).populate('producto');
+        const subastas = await Subasta.find().populate('producto');
         const productsReady = [];
         subastas.forEach(pro => {
             if (dateA < pro.fecha_fin && dateB > pro.fecha_fin && pro.producto.category === supervisor.category) {
@@ -110,10 +110,24 @@ const getProductosSubastados = async(req = request, res) => {
 
 const getMontoTotal = async(req = request, res) => {
     try {
+        if (!req.params.dateA || !req.params.dateB) {
+            return res.status(400).json({
+                ok: false,
+                error: 'Ingrese los parámetros en formate fecha'
+            })
+        }
+        const dateA = new Date(req.params.dateA);
+        const dateB = new Date(req.params.dateB);
         const subastas = await Subasta.find({ estado: 'FINALIZADO' });
+        const productsReady = [];
+        subastas.forEach(pro => {
+            if(dateA <= pro.fecha_fin && pro.fecha_fin <= dateB) {
+                productsReady.push(pro);
+            }
+        });
         return res.status(200).json({
             ok: true,
-            data: subastas
+            data: productsReady
         })
 
     } catch (error) {

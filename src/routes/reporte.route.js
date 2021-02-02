@@ -11,7 +11,7 @@ router.get('/productsByCategory/:dateA/:dateB', [validationJWT], getProductsSuba
 router.get('/compradores', [validationJWT], getCompradores);
 router.get('/totalProductsByCategory', [validationJWT], getTotalProductsByCategory);
 router.get('/productosSubastados', [validationJWT], getProductosSubastados);
-router.get('/monto', [validationJWT], getMontoTotal);
+router.get('/monto/:dateA/:dateB', [validationJWT], getMontoTotal);
 router.get('/participacion', [validationJWT], getSubastasByParticipacion);
 // router.get('/', [validationJWT], getSubastas);
 // router.get('/getSubastasByIdComprador/:idComprador', [validationJWT], getSubastasByIdComprador);
